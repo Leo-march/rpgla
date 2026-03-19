@@ -40,7 +40,8 @@ export default function BattleScreen() {
           <span className={`px-2 py-0.5 rounded text-xs font-display
             ${mapDef?.difficulty === "Iniciante" ? "text-green-400 border border-green-800" :
               mapDef?.difficulty === "Intermediário" ? "text-yellow-400 border border-yellow-800" :
-              "text-red-400 border border-red-900"}`}>
+              mapDef?.difficulty === "Avançado" ? "text-red-400 border border-red-900" :
+              "text-purple-400 border border-purple-900"}`}>
             {mapDef?.difficulty}
           </span>
           {mapDef && mapDef.defenseDebuff < 1 && (

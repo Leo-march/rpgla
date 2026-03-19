@@ -21,6 +21,7 @@ interface GameStore {
   performAction: (actionType: ActionType, skillId?: string, targetId?: string, itemId?: string) => void;
   buyItem: (itemId: string) => void;
   ready: () => void;
+  returnToMapSelect: () => void;
   disconnect: () => void;
 }
 
@@ -95,6 +96,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   ready: () => {
     get().socket?.emit("ready");
+  },
+
+  returnToMapSelect: () => {
+    get().socket?.emit("return_to_map_select");
   },
 
   disconnect: () => {

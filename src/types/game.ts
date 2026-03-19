@@ -1,7 +1,7 @@
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
 export type ClassType = "warrior" | "mage" | "ranger" | "necromancer" | "paladin" | "assassin";
-export type MapId = "forest" | "dungeon" | "abyss";
+export type MapId = "forest" | "dungeon" | "abyss" | "volcano" | "cemetery" | "ice_castle" | "void";
 export type GamePhase = "lobby" | "map_select" | "playing" | "shop" | "game_over" | "victory";
 export type TurnPhase = "player_actions" | "processing" | "monster_turn" | "broadcast";
 export type ActionType = "attack" | "special" | "use_item" | "skip";
@@ -109,7 +109,7 @@ export interface MapDefinition {
   id: MapId;
   name: string;
   description: string;
-  difficulty: "Iniciante" | "Intermediário" | "Avançado";
+  difficulty: "Iniciante" | "Intermediário" | "Avançado" | "Lendário";
   defenseDebuff: number;   // multiplier, e.g. 0.8 = -20%
   manaCostMultiplier: number; // e.g. 2 = double
   monsterLevel: number;
@@ -165,4 +165,5 @@ export interface ClientToServerEvents {
   buy_item: (itemId: string) => void;
   start_game: () => void;
   ready: () => void;
+  return_to_map_select: () => void;
 }

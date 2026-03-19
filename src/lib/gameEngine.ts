@@ -64,7 +64,7 @@ export function createInitialGameState(roomId: string): GameState {
     players: [],
     monsters: [],
     currentBoss: null,
-    bossDefeated: { forest: false, dungeon: false, abyss: false },
+    bossDefeated: { forest: false, dungeon: false, abyss: false, volcano: false, cemetery: false, ice_castle: false, void: false },
     unlockedClasses: ["warrior", "mage", "ranger"],
     sharedCoins: 0, // kept for compatibility, no longer used for coins
     shopItems: SHOP_ITEMS,
@@ -465,3 +465,32 @@ export function buyItem(
 }
 
 export { nanoid };
+
+// ─── Reset for new map (keep players, restore HP/MP) ─────────────────────────
+
+export function resetForNewMap(state: GameState): GameState {
+  // Restore all players to full HP/MP and reset turn state
+  state.players.forEach((p) => {
+    p.attributes.hp = p.attributes.maxHp;
+    p.attributes.mp = p.attributes.maxMp;
+    p.hasActedThisTurn = false;
+    p.statusEffects = [];
+    p.summonActive = false;
+    p.summonTurnsLeft = 0;
+  });
+  state.monsters = [];
+  state.currentBoss = null;
+  state.turnNumber = 0;
+  state.turnPhase = "player_actions";
+  state.currentPlayerTurnIndex = 0;
+  state.roundWinner = null;
+  state.currentMap = null;
+  state.phase = "lobby";
+  state.combatLog.push({
+    id: nanoid(),
+    timestamp: Date.now(),
+    message: "✨ O grupo descansou e se recuperou. Escolha o próximo mapa!",
+    type: "system",
+  });
+  return state;
+}

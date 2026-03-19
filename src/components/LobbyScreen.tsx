@@ -88,7 +88,9 @@ export default function LobbyScreen() {
                     <span className="font-display text-sm text-dungeon-text">{map.name}</span>
                     <span className={`text-xs font-display
                       ${map.difficulty === "Iniciante" ? "text-green-400" :
-                        map.difficulty === "Intermediário" ? "text-yellow-400" : "text-red-400"}`}>
+                        map.difficulty === "Intermediário" ? "text-yellow-400" :
+                        map.difficulty === "Avançado" ? "text-red-400" :
+                        "text-purple-400"}`}>
                       {map.difficulty}
                     </span>
                   </div>
