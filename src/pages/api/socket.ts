@@ -88,7 +88,12 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
     {
       path: "/api/socket",
       addTrailingSlash: false,
-      cors: { origin: "*" },
+      transports: ["polling", "websocket"],
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+      },
+      allowEIO3: true,
     }
   );
   res.socket.server.io = io;
@@ -316,7 +321,9 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
       const player = room.players.find((p) => p.id === socket.id)!;
       player.hasActedThisTurn = true; // reuse for "ready"
 
-      const allReady = room.players.every((p) => p.hasActedThisTurn);
+      // Only wait for alive + connected players
+      const activePlayers = room.players.filter((p) => p.attributes.hp > 0 && p.isConnected);
+      const allReady = activePlayers.every((p) => p.hasActedThisTurn);
       if (allReady) {
         room.phase = "playing";
         room.players.forEach((p) => (p.hasActedThisTurn = false));
