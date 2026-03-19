@@ -302,15 +302,15 @@ export function processPlayerAction(
     // Check monster death
     if (target.hp <= 0) {
       log.push(logEntry(`💀 ${target.name} foi derrotado!`, "system"));
-      const xpGain = Math.floor(target.xpReward / state.players.length);
-      const coinsGain = Math.floor(target.coinReward / state.players.length);
+      const alivePlayers = state.players.filter((p) => p.attributes.hp > 0);
+      const xpGain = Math.floor(target.xpReward / alivePlayers.length);
+      // Coins: each alive player gets full reward (not split), to avoid flooring to 0
+      const coinsGain = target.coinReward;
 
-      state.players.forEach((p) => {
-        if (p.attributes.hp > 0) {
-          p.xp += xpGain;
-          p.coins += coinsGain;
-          checkLevelUp(p, log);
-        }
+      alivePlayers.forEach((p) => {
+        p.xp += xpGain;
+        p.coins += coinsGain;
+        checkLevelUp(p, log);
       });
       log.push(logEntry(`💰 Cada jogador recebeu ${coinsGain} moedas!`, "system"));
 

@@ -11,7 +11,7 @@ export default function LobbyScreen() {
 
   const me = gameState.players.find((p) => p.id === myPlayerId);
   const isLeader = gameState.players[0]?.id === myPlayerId;
-  const canStart = gameState.players.length === 4 && !!gameState.currentMap && isLeader;
+  const canStart = gameState.players.length >= 1 && !!gameState.currentMap && isLeader;
 
   return (
     <div className="min-h-screen dungeon-bg p-4 md:p-8">
@@ -124,9 +124,7 @@ export default function LobbyScreen() {
                          hover:bg-dungeon-gold hover:text-dungeon-bg transition-all duration-200
                          disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {gameState.players.length < 4
-                ? `⏳ Aguardando ${4 - gameState.players.length} jogador(es)...`
-                : !gameState.currentMap
+              {!gameState.currentMap
                 ? "🗺️ Selecione um mapa primeiro"
                 : "⚔️ Iniciar Aventura!"}
             </button>
