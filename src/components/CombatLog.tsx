@@ -8,11 +8,12 @@ interface CombatLogProps {
 const TYPE_STYLES: Record<CombatEntry["type"], string> = {
   player_attack: "text-green-400",
   monster_attack: "text-red-400",
-  level_up: "text-yellow-300",
+  level_up: "text-yellow-300 font-bold",
   item: "text-blue-300",
   system: "text-dungeon-text-dim",
   special: "text-purple-400",
   combo: "text-fuchsia-400 font-semibold",
+  initiative: "text-amber-400",
 };
 
 export default function CombatLog({ entries }: CombatLogProps) {
@@ -24,9 +25,9 @@ export default function CombatLog({ entries }: CombatLogProps) {
 
   return (
     <div className="dungeon-card h-full flex flex-col">
-      <div className="px-3 py-2 border-b border-dungeon-border">
+      <div className="px-3 py-2 border-b border-dungeon-border bg-dungeon-surface/50">
         <h3 className="font-display text-xs text-dungeon-gold tracking-widest uppercase">
-          ⚔️ Log de Combate
+          📜 Log de Combate
         </h3>
       </div>
       <div className="flex-1 overflow-y-auto p-3 space-y-0.5 font-mono text-xs min-h-0">

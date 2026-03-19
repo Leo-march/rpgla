@@ -1,10 +1,21 @@
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
-export type ClassType = "warrior" | "mage" | "ranger" | "necromancer" | "paladin" | "assassin";
+export type ClassType = "warrior" | "mage" | "ranger" | "necromancer" | "paladin" | "assassin" | "druida" | "berserker";
 export type MapId = "forest" | "dungeon" | "abyss" | "volcano" | "cemetery" | "ice_castle" | "void";
 export type GamePhase = "lobby" | "map_select" | "playing" | "shop" | "game_over" | "victory";
-export type TurnPhase = "player_actions" | "processing" | "monster_turn" | "broadcast";
+export type TurnPhase = "initiative_roll" | "player_actions" | "processing" | "monster_turn" | "broadcast";
 export type ActionType = "attack" | "special" | "use_item" | "skip" | "combo_propose" | "combo_accept" | "combo_cancel" | "combo_execute";
+
+// ─── Initiative ───────────────────────────────────────────────────────────────
+
+export interface InitiativeEntry {
+  id: string;         // player id or monster id
+  name: string;
+  roll: number;
+  isPlayer: boolean;
+  isMonster?: boolean;
+  acted: boolean;
+}
 
 // ─── Attributes ──────────────────────────────────────────────────────────────
 
@@ -28,6 +39,8 @@ export interface Item {
   defenseBonus: number;
   hpBonus: number;
   mpBonus: number;
+  hpRestore?: number;
+  mpRestore?: number;
 }
 
 // ─── Skills ──────────────────────────────────────────────────────────────────
@@ -48,7 +61,7 @@ export interface ComboAction {
   id: string;
   name: string;
   description: string;
-  requiredClasses: [ClassType, ClassType]; // pair of classes needed
+  requiredClasses: [ClassType, ClassType];
   mpCostPerPlayer: number;
   damageMultiplier: number;
   effectKey: string;
@@ -58,12 +71,12 @@ export interface ComboAction {
 export interface PendingCombo {
   id: string;
   proposerId: string;
-  partnerId: string; // empty = waiting for any partner
+  partnerId: string;
   comboActionId: string;
   targetId?: string;
   proposerReady: boolean;
   partnerReady: boolean;
-  expiresAt: number; // timestamp
+  expiresAt: number;
 }
 
 // ─── Class Definition ─────────────────────────────────────────────────────────
@@ -97,7 +110,8 @@ export interface Player {
   isConnected: boolean;
   summonActive: boolean;
   summonTurnsLeft: number;
-  pendingComboId?: string; // if player is in a pending combo
+  pendingComboId?: string;
+  initiativeRoll?: number;
 }
 
 // ─── Status Effects ───────────────────────────────────────────────────────────
@@ -108,6 +122,7 @@ export interface StatusEffect {
   turnsLeft: number;
   attackBonus?: number;
   defenseBonus?: number;
+  damagePerTurn?: number;
 }
 
 // ─── Monster ─────────────────────────────────────────────────────────────────
@@ -124,6 +139,7 @@ export interface Monster {
   xpReward: number;
   coinReward: number;
   isBoss: boolean;
+  initiativeRoll?: number;
 }
 
 // ─── Map ─────────────────────────────────────────────────────────────────────
@@ -147,7 +163,7 @@ export interface CombatEntry {
   id: string;
   timestamp: number;
   message: string;
-  type: "player_attack" | "monster_attack" | "level_up" | "item" | "system" | "special" | "combo";
+  type: "player_attack" | "monster_attack" | "level_up" | "item" | "system" | "special" | "combo" | "initiative";
 }
 
 // ─── Game State ───────────────────────────────────────────────────────────────
@@ -169,6 +185,9 @@ export interface GameState {
   currentPlayerTurnIndex: number;
   roundWinner: null | "players" | "monsters";
   pendingCombos: PendingCombo[];
+  initiativeOrder: InitiativeEntry[];
+  currentInitiativeIndex: number;
+  initiativeRolled: boolean;
 }
 
 // ─── Socket Events ────────────────────────────────────────────────────────────

@@ -8,34 +8,37 @@ interface MonsterCardProps {
 }
 
 export default function MonsterCard({ monster, onSelect, selected }: MonsterCardProps) {
-  const isDead = monster.hp <= 0;
-  if (isDead) return null;
+  if (monster.hp <= 0) return null;
 
   return (
     <div
       onClick={() => onSelect?.(monster.id)}
       className={`dungeon-card p-3 cursor-pointer transition-all duration-200 relative
-        ${selected
-          ? "border-dungeon-gold glow-gold ring-1 ring-dungeon-gold/50"
-          : "hover:border-dungeon-crimson hover:shadow-md"}
-        ${monster.isBoss ? "border-yellow-600 animate-pulse-slow" : ""}
+        ${selected ? "border-dungeon-gold glow-gold ring-1 ring-dungeon-gold/50" : "hover:border-dungeon-crimson hover:shadow-md"}
+        ${monster.isBoss ? "border-yellow-600/70" : ""}
       `}
     >
-      {/* Target indicator */}
       {selected && (
-        <div className="absolute -top-1.5 -right-1.5 bg-dungeon-gold text-dungeon-bg text-xs font-display px-1 rounded-full">
+        <div className="absolute -top-1.5 -right-1.5 bg-dungeon-gold text-dungeon-bg text-xs font-display px-1.5 py-0.5 rounded-full">
           🎯
         </div>
       )}
 
+      {monster.initiativeRoll !== undefined && (
+        <div className={`absolute top-1 right-1 text-xs font-mono px-1 rounded
+          ${monster.initiativeRoll >= 15 ? "text-red-300 bg-red-950/60" :
+            monster.initiativeRoll >= 8 ? "text-yellow-400 bg-yellow-950/60" :
+            "text-dungeon-text-dim bg-dungeon-border/60"}`}>
+          🎲{monster.initiativeRoll}
+        </div>
+      )}
+
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-3xl">{monster.emoji}</span>
+        <span className={`${monster.isBoss ? "text-4xl" : "text-3xl"}`}>{monster.emoji}</span>
         <div>
-          <div className="font-display text-sm text-dungeon-text">
+          <div className="font-display text-sm text-dungeon-text leading-tight">
             {monster.name}
-            {monster.isBoss && (
-              <span className="ml-1 text-xs text-yellow-400 font-display">⚠️ BOSS</span>
-            )}
+            {monster.isBoss && <span className="ml-1 text-xs text-yellow-400">⚠️ BOSS</span>}
           </div>
           <div className="text-dungeon-text-dim text-xs">Nv.{monster.level}</div>
         </div>
