@@ -7,7 +7,8 @@ export default function ShopPanel() {
 
   const me = gameState.players.find((p) => p.id === myPlayerId);
   const myReady = me?.hasActedThisTurn;
-  const readyCount = gameState.players.filter((p) => p.hasActedThisTurn).length;
+  const activePlayers = gameState.players.filter((p) => p.attributes.hp > 0 && p.isConnected);
+  const readyCount = activePlayers.filter((p) => p.hasActedThisTurn).length;
 
   return (
     <div className="min-h-screen dungeon-bg flex items-center justify-center p-4">
@@ -15,10 +16,10 @@ export default function ShopPanel() {
         <div className="text-center mb-6">
           <h2 className="font-display text-3xl text-dungeon-gold mb-1">🏪 Loja do Viajante</h2>
           <p className="text-dungeon-text-dim text-sm">
-            Moedas do grupo: <span className="text-yellow-400 font-mono">{gameState.sharedCoins} 💰</span>
+            Suas moedas: <span className="text-yellow-400 font-mono">{me?.coins ?? 0} 💰</span>
           </p>
           <p className="text-dungeon-text-dim text-xs mt-1">
-            Prontos: {readyCount}/{gameState.players.length}
+            Prontos: {readyCount}/{activePlayers.length}
           </p>
         </div>
 
@@ -45,7 +46,7 @@ export default function ShopPanel() {
                 <div className="text-yellow-400 font-mono text-sm">{item.cost}💰</div>
                 <button
                   onClick={() => buyItem(item.id)}
-                  disabled={gameState.sharedCoins < item.cost || !!myReady}
+                  disabled={(me?.coins ?? 0) < item.cost || !!myReady}
                   className="mt-1 text-xs px-3 py-1 border border-dungeon-gold text-dungeon-gold
                              hover:bg-dungeon-gold hover:text-dungeon-bg transition-all
                              disabled:opacity-40 disabled:cursor-not-allowed"

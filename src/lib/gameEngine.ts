@@ -66,7 +66,7 @@ export function createInitialGameState(roomId: string): GameState {
     currentBoss: null,
     bossDefeated: { forest: false, dungeon: false, abyss: false },
     unlockedClasses: ["warrior", "mage", "ranger"],
-    sharedCoins: 0,
+    sharedCoins: 0, // kept for compatibility, no longer used for coins
     shopItems: SHOP_ITEMS,
     combatLog: [logEntry("⚔️ Aventureiros chegaram à taverna. Aguardando grupo completo...", "system")],
     turnNumber: 0,
@@ -303,15 +303,16 @@ export function processPlayerAction(
     if (target.hp <= 0) {
       log.push(logEntry(`💀 ${target.name} foi derrotado!`, "system"));
       const xpGain = Math.floor(target.xpReward / state.players.length);
-      state.sharedCoins += target.coinReward;
+      const coinsGain = Math.floor(target.coinReward / state.players.length);
 
       state.players.forEach((p) => {
         if (p.attributes.hp > 0) {
           p.xp += xpGain;
+          p.coins += coinsGain;
           checkLevelUp(p, log);
         }
       });
-      log.push(logEntry(`💰 Grupo recebeu ${target.coinReward} moedas! (Total: ${state.sharedCoins})`, "system"));
+      log.push(logEntry(`💰 Cada jogador recebeu ${coinsGain} moedas!`, "system"));
 
       // Remove from state
       if (state.currentBoss && target.id === state.currentBoss.id) {
@@ -445,12 +446,12 @@ export function buyItem(
   const item = SHOP_ITEMS.find((i) => i.id === itemId);
 
   if (!player || !item) return { state, newEntries: [] };
-  if (state.sharedCoins < item.cost) {
+  if (player.coins < item.cost) {
     log.push(logEntry("❌ Moedas insuficientes!", "system"));
     return { state, newEntries: log };
   }
 
-  state.sharedCoins -= item.cost;
+  player.coins -= item.cost;
   player.inventory.push({ ...item, id: nanoid() });
   player.attributes.attack += item.attackBonus;
   player.attributes.defense += item.defenseBonus;
@@ -459,7 +460,7 @@ export function buyItem(
   player.attributes.maxMp += item.mpBonus;
   player.attributes.mp = clamp(player.attributes.mp + item.mpBonus, 0, player.attributes.maxMp);
 
-  log.push(logEntry(`🛒 ${player.name} comprou "${item.name}"! (Moedas: ${state.sharedCoins})`, "item"));
+  log.push(logEntry(`🛒 ${player.name} comprou "${item.name}"! (Moedas restantes: ${player.coins})`, "item"));
   return { state, newEntries: log };
 }
 

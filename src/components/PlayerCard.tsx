@@ -70,6 +70,7 @@ export default function PlayerCard({ player, isMe, isCurrentTurn }: PlayerCardPr
       <div className="flex gap-3 mt-2 text-xs text-dungeon-text-dim font-mono">
         <span>⚔️ {player.attributes.attack}</span>
         <span>🛡️ {player.attributes.defense}</span>
+        <span>💰 {player.coins}</span>
         {player.summonActive && (
           <span className="text-purple-400">💀+{player.summonTurnsLeft}t</span>
         )}

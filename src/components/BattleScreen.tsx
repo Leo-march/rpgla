@@ -22,9 +22,9 @@ export default function BattleScreen() {
   const isBossFight = !!gameState.currentBoss && gameState.currentBoss.hp > 0;
 
   return (
-    <div className="min-h-screen dungeon-bg flex flex-col">
+    <div className="h-screen dungeon-bg flex flex-col overflow-hidden">
       {/* Top bar */}
-      <div className="border-b border-dungeon-border px-4 py-2 flex items-center justify-between">
+      <div className="border-b border-dungeon-border px-4 py-2 flex items-center justify-between flex-shrink-0">
         <div className="font-display text-dungeon-gold text-sm tracking-wide">
           ⚔️ {mapDef?.name ?? "Batalha"}
           <span className="text-dungeon-text-dim text-xs ml-2">
@@ -36,7 +36,7 @@ export default function BattleScreen() {
             ${isBossFight ? "text-yellow-400 animate-pulse" : "text-dungeon-text-dim"}`}>
             {isBossFight ? "⚠️ BOSS BATTLE" : gameState.turnPhase === "monster_turn" ? "👹 Turno dos Monstros" : "🧑 Turno dos Jogadores"}
           </span>
-          <span>💰 {gameState.sharedCoins}</span>
+          {me && <span>💰 {me.coins}</span>}
           <span className={`px-2 py-0.5 rounded text-xs font-display
             ${mapDef?.difficulty === "Iniciante" ? "text-green-400 border border-green-800" :
               mapDef?.difficulty === "Intermediário" ? "text-yellow-400 border border-yellow-800" :
@@ -52,10 +52,10 @@ export default function BattleScreen() {
         </div>
       </div>
 
-      {/* Main layout */}
-      <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+      {/* Main layout - fills remaining height */}
+      <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left: Players */}
-        <div className="w-56 flex-shrink-0 border-r border-dungeon-border p-2 overflow-y-auto space-y-2">
+        <div className="w-52 flex-shrink-0 border-r border-dungeon-border p-2 overflow-y-auto space-y-2">
           <div className="text-xs font-display text-dungeon-text-dim tracking-widest uppercase px-1 pb-1 border-b border-dungeon-border">
             Grupo
           </div>
@@ -69,22 +69,22 @@ export default function BattleScreen() {
           ))}
         </div>
 
-        {/* Center: Battle field */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Monsters */}
-          <div className="flex-1 p-4 overflow-y-auto">
-            <div className="text-xs font-display text-dungeon-text-dim tracking-widest uppercase mb-3">
+        {/* Center: Battle field + actions */}
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+          {/* Monsters - scrollable if needed */}
+          <div className="flex-1 p-3 overflow-y-auto min-h-0">
+            <div className="text-xs font-display text-dungeon-text-dim tracking-widest uppercase mb-2">
               {isBossFight ? "⚠️ Chefe" : "👹 Inimigos"}
             </div>
 
             {allMonsters.length === 0 ? (
-              <div className="flex items-center justify-center h-32">
-                <span className="text-dungeon-text-dim font-display text-lg animate-pulse">
+              <div className="flex items-center justify-center h-24">
+                <span className="text-dungeon-text-dim font-display text-base animate-pulse">
                   ✨ Todos os inimigos foram derrotados!
                 </span>
               </div>
             ) : (
-              <div className={`grid gap-3 ${isBossFight ? "grid-cols-1 max-w-sm mx-auto" : "grid-cols-2 md:grid-cols-3"}`}>
+              <div className={`grid gap-2 ${isBossFight ? "grid-cols-1 max-w-xs" : "grid-cols-2 md:grid-cols-3"}`}>
                 {allMonsters.map((monster) => (
                   <MonsterCard
                     key={monster.id}
@@ -97,8 +97,8 @@ export default function BattleScreen() {
             )}
           </div>
 
-          {/* Action panel */}
-          <div className="border-t border-dungeon-border p-3">
+          {/* Action panel - fixed at bottom of center */}
+          <div className="border-t border-dungeon-border p-2 flex-shrink-0">
             {me ? (
               <ActionPanel
                 player={me}
@@ -107,7 +107,7 @@ export default function BattleScreen() {
                 mapManaMult={mapDef?.manaCostMultiplier ?? 1}
               />
             ) : (
-              <div className="text-center text-dungeon-text-dim font-display text-sm py-4">
+              <div className="text-center text-dungeon-text-dim font-display text-sm py-2">
                 Você não está nesta partida
               </div>
             )}
@@ -115,7 +115,7 @@ export default function BattleScreen() {
         </div>
 
         {/* Right: Combat log */}
-        <div className="w-72 flex-shrink-0 border-l border-dungeon-border flex flex-col" style={{ minHeight: 0 }}>
+        <div className="w-64 flex-shrink-0 border-l border-dungeon-border flex flex-col overflow-hidden min-h-0">
           <CombatLog entries={combatLog} />
         </div>
       </div>
