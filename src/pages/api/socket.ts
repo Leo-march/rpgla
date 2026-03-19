@@ -70,6 +70,12 @@ function startNewRound(roomId: string) {
   rooms[roomId] = stateAfterInit;
   broadcastLog(roomId, initEntries);
   broadcast(roomId, stateAfterInit);
+
+  // If the first actor is a monster, process it automatically after a short delay
+  const firstActor = getNextActorInInitiative(stateAfterInit);
+  if (firstActor && firstActor.isMonster) {
+    setTimeout(() => resolveAfterAction(roomId), 800);
+  }
 }
 
 // ─── Post-action resolution ───────────────────────────────────────────────────
