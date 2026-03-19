@@ -152,7 +152,6 @@ function endOfRound(roomId: string) {
   if (paladin) {
     state.players.forEach(p => {
       if (p.attributes.hp > 0) {
-        const { clamp } = require("./gameEngine") as never;
         p.attributes.hp = Math.min(p.attributes.maxHp, p.attributes.hp + 6);
       }
     });
