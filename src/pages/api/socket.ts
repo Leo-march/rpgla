@@ -52,26 +52,26 @@ function spawnNextWave(state: GameState): CombatEntry[] {
   return log;
 }
 
-// ─── Start a new round (roll initiative) ─────────────────────────────────────
+// ─── Start a new combat (roll initiative ONCE per combat) ────────────────────
 
-function startNewRound(roomId: string) {
+function startNewCombat(roomId: string) {
   const state = rooms[roomId];
   if (!state || state.phase !== "playing") return;
 
-  // Check if we need to spawn before rolling
+  // Spawn enemies if needed
   const noEnemies = state.monsters.filter(m => m.hp > 0).length === 0 && (!state.currentBoss || state.currentBoss.hp <= 0);
   if (noEnemies) {
     const spawnLogs = spawnNextWave(state);
     broadcastLog(roomId, spawnLogs);
   }
 
-  // Roll initiative for the new round
+  // Roll initiative ONCE for this entire combat encounter
   const { state: stateAfterInit, newEntries: initEntries } = rollInitiative(state);
   rooms[roomId] = stateAfterInit;
   broadcastLog(roomId, initEntries);
   broadcast(roomId, stateAfterInit);
 
-  // If the first actor is a monster, process it automatically after a short delay
+  // If the first actor is a monster, process it automatically
   const firstActor = getNextActorInInitiative(stateAfterInit);
   if (firstActor && firstActor.isMonster) {
     setTimeout(() => resolveAfterAction(roomId), 800);
@@ -192,11 +192,21 @@ function endOfRound(roomId: string) {
 
   broadcastLog(roomId, log);
 
-  // Reset for next round
-  state.players.forEach(p => { p.hasActedThisTurn = false; p.pendingComboId = undefined; p.initiativeRoll = undefined; });
+  // Reset for next round — KEEP the same initiative order, just reset who has acted
+  state.players.forEach(p => { p.hasActedThisTurn = false; p.pendingComboId = undefined; });
   state.pendingCombos = [];
-  state.initiativeOrder = [];
-  state.initiativeRolled = false;
+  // Reset acted flags in initiative order (keep the same order!)
+  state.initiativeOrder.forEach(e => { e.acted = false; });
+  // Re-mark dead/disconnected actors as already acted so they are skipped
+  state.initiativeOrder.forEach(e => {
+    if (e.isPlayer) {
+      const p = state.players.find(p => p.id === e.id);
+      if (!p || p.attributes.hp <= 0 || !p.isConnected) e.acted = true;
+    } else {
+      const m = [...state.monsters, ...(state.currentBoss ? [state.currentBoss] : [])].find(m => m.id === e.id);
+      if (!m || m.hp <= 0) e.acted = true;
+    }
+  });
   state.turnNumber++;
 
   // Check game end after status effects
@@ -228,9 +238,22 @@ function endOfRound(roomId: string) {
     return;
   }
 
-  // Start new round — auto-roll initiative
-  broadcast(roomId, state);
-  setTimeout(() => startNewRound(roomId), 800);
+  // Continue combat with SAME initiative order, or start new combat if wave cleared
+  const noEnemiesLeft = state.monsters.filter(m => m.hp > 0).length === 0 && (!state.currentBoss || state.currentBoss.hp <= 0);
+
+  if (noEnemiesLeft) {
+    // New wave/boss — spawn and roll new initiative
+    broadcast(roomId, state);
+    setTimeout(() => startNewCombat(roomId), 800);
+  } else {
+    // Same enemies alive — resume with same initiative order
+    broadcast(roomId, state);
+    // If first actor in the reset order is a monster, process automatically
+    const firstActor = getNextActorInInitiative(state);
+    if (firstActor && firstActor.isMonster) {
+      setTimeout(() => resolveAfterAction(roomId), 800);
+    }
+  }
 }
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
@@ -279,8 +302,8 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
       room.players.forEach(p => (p.hasActedThisTurn = false));
       room.combatLog.push({ id: nanoid(), timestamp: Date.now(), message: `⚔️ A batalha começou! ${room.monsters.length} inimigo(s)!`, type: "system" });
       broadcast(room.roomId, room);
-      // Auto-roll initiative
-      setTimeout(() => startNewRound(room.roomId), 500);
+      // Roll initiative for this combat
+      setTimeout(() => startNewCombat(room.roomId), 500);
     });
 
     socket.on("player_action", ({ actionType, skillId, targetId, itemId, comboActionId, partnerId }) => {
@@ -352,10 +375,9 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
         room.initiativeRolled = false;
         if (room.monsters.length === 0 && !room.currentBoss) {
           room.monsters = spawnMonstersForMap(room.currentMap!);
-        }
-        room.combatLog.push({ id: nanoid(), timestamp: Date.now(), message: "⚔️ De volta à batalha!", type: "system" });
+        }        room.combatLog.push({ id: nanoid(), timestamp: Date.now(), message: "⚔️ De volta à batalha!", type: "system" });
         broadcast(room.roomId, room);
-        setTimeout(() => startNewRound(room.roomId), 500);
+        setTimeout(() => startNewCombat(room.roomId), 500);
       } else {
         broadcast(room.roomId, room);
       }
