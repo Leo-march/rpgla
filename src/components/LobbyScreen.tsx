@@ -96,10 +96,10 @@ export default function LobbyScreen() {
                   </div>
                   <p className="text-xs text-dungeon-text-dim mt-1">{map.description}</p>
                   {map.defenseDebuff < 1 && (
-                    <span className="text-xs text-red-400">⚠️ -20% Defesa</span>
+                    <span className="text-xs text-red-400">⚠️ -{Math.round((1 - map.defenseDebuff) * 100)}% Defesa</span>
                   )}
                   {map.manaCostMultiplier > 1 && (
-                    <span className="text-xs text-blue-400">⚠️ Custo de Mana x2</span>
+                    <span className="text-xs text-blue-400 ml-2">⚠️ Custo de Mana x{map.manaCostMultiplier}</span>
                   )}
                 </button>
               ))}
