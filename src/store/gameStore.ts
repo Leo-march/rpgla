@@ -36,7 +36,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   connect: () => {
     // Trigger socket API initialization
     fetch("/api/socket").finally(() => {
-      const socket: AppSocket = io({ path: "/api/socket", addTrailingSlash: false });
+      const socket: AppSocket = io({ path: "/api/socket", addTrailingSlash: false, transports: ["websocket", "polling"] });
 
       socket.on("connect", () => {
         set({ isConnected: true, myPlayerId: socket.id, connectionError: null });
