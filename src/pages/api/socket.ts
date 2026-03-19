@@ -140,8 +140,22 @@ function resolveAfterAction(roomId: string) {
     // After monster acts, check again
     setTimeout(() => resolveAfterAction(roomId), 600);
   } else {
-    // Player's turn — just broadcast, wait for player input
-    broadcast(roomId, state);
+    // Player's turn — check if they have an accepted combo ready to fire
+    const player = state.players.find(p => p.id === nextActor.id);
+    const readyCombo = player
+      ? state.pendingCombos.find(c => c.partnerId === player.id && c.partnerReady)
+      : null;
+
+    if (readyCombo) {
+      // Auto-execute the combo as this player's action
+      const { state: newState, newEntries } = processPlayerAction(state, nextActor.id, "combo_execute", {});
+      rooms[roomId] = newState;
+      broadcastLog(roomId, newEntries);
+      resolveAfterAction(roomId);
+    } else {
+      // Normal turn — wait for player input
+      broadcast(roomId, state);
+    }
   }
 }
 
@@ -164,21 +178,24 @@ function endOfRound(roomId: string) {
     log.push({ id: nanoid(), timestamp: Date.now(), message: `✨ Fim da rodada — ${paladin.name} cura o grupo em 6 HP!`, type: "special" });
   }
 
-  // Tick status effects
+  // Tick status effects — turnsLeft === -1 means permanent (never expires)
   state.players.forEach(p => {
     p.statusEffects.forEach(se => {
       if (se.damagePerTurn && se.damagePerTurn > 0 && p.attributes.hp > 0) {
         p.attributes.hp = Math.max(0, p.attributes.hp - se.damagePerTurn);
-        log.push({ id: nanoid(), timestamp: Date.now(), message: `☠️ ${p.name} sofre ${se.damagePerTurn} DoT`, type: "system" });
+        log.push({ id: nanoid(), timestamp: Date.now(), message: `☠️ ${p.name} sofre ${se.damagePerTurn} DoT (${se.name})`, type: "system" });
       }
     });
-    p.statusEffects = p.statusEffects.map(se => ({ ...se, turnsLeft: se.turnsLeft - 1 })).filter(se => {
-      if (se.turnsLeft <= 0) {
-        log.push({ id: nanoid(), timestamp: Date.now(), message: `${p.name}: "${se.name}" expirou.`, type: "system" });
-        return false;
-      }
-      return true;
-    });
+    p.statusEffects = p.statusEffects
+      .map(se => se.turnsLeft === -1 ? se : { ...se, turnsLeft: se.turnsLeft - 1 })
+      .filter(se => {
+        if (se.turnsLeft === -1) return true; // permanent
+        if (se.turnsLeft <= 0) {
+          log.push({ id: nanoid(), timestamp: Date.now(), message: `${p.name}: "${se.name}" expirou.`, type: "system" });
+          return false;
+        }
+        return true;
+      });
     if (p.summonActive) {
       p.summonTurnsLeft--;
       if (p.summonTurnsLeft <= 0) { p.summonActive = false; }
@@ -313,26 +330,16 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
       const player = room.players.find(p => p.id === socket.id);
       if (!player || player.attributes.hp <= 0) return;
 
-      // combo_accept and combo_cancel: only valid on THIS player's turn (or cancel always allowed)
-      if (actionType === "combo_accept") {
-        if (player.hasActedThisTurn) return;
-        const nextActor = getNextActorInInitiative(room);
-        if (!nextActor || nextActor.id !== socket.id) {
-          socket.emit("error", "Você só pode aceitar um combo no seu turno!");
-          return;
-        }
-      }
-
+      // combo_accept can happen ANY time (doesn't consume turn)
+      // combo_cancel can happen any time
+      // All other actions require it to be this player's turn
       if (actionType !== "combo_accept" && actionType !== "combo_cancel" && actionType !== "combo_propose") {
         if (player.hasActedThisTurn) return;
-        // Verify it's this player's turn in initiative order
         const nextActor = getNextActorInInitiative(room);
         if (!nextActor || nextActor.id !== socket.id) {
           socket.emit("error", "Não é seu turno!");
           return;
         }
-      } else {
-        if (player.attributes.hp <= 0) return;
       }
 
       const { state: newState, newEntries } = processPlayerAction(room, socket.id, actionType, { skillId, targetId, itemId, comboActionId, partnerId });

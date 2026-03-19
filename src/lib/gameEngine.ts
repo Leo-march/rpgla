@@ -207,22 +207,26 @@ export function calculateDamage(
 }
 
 // ─── Status Effect Tick ───────────────────────────────────────────────────────
+// turnsLeft === -1 means PERMANENT for the battle (never ticks, never expires)
+// turnsLeft > 0 decrements each round and expires at 0
 
 export function tickStatusEffects(entity: Player | Monster, log: CombatEntry[], isPlayer: boolean): void {
   if (!("statusEffects" in entity)) return;
   const p = entity as Player;
 
-  // Apply DoT
+  // Apply DoT for effects that have damagePerTurn
   p.statusEffects.forEach(se => {
     if (se.damagePerTurn && se.damagePerTurn > 0) {
       p.attributes.hp = Math.max(0, p.attributes.hp - se.damagePerTurn);
-      log.push(logEntry(`☠️ ${p.name} sofre ${se.damagePerTurn} de dano de ${se.name}!`, "system"));
+      log.push(logEntry(`☠️ ${p.name} sofre ${se.damagePerTurn} de dano (${se.name})!`, "system"));
     }
   });
 
+  // Decrement and expire — skip permanent effects (turnsLeft === -1)
   p.statusEffects = p.statusEffects
-    .map((se) => ({ ...se, turnsLeft: se.turnsLeft - 1 }))
-    .filter((se) => {
+    .map(se => se.turnsLeft === -1 ? se : { ...se, turnsLeft: se.turnsLeft - 1 })
+    .filter(se => {
+      if (se.turnsLeft === -1) return true; // permanent, keep forever
       if (se.turnsLeft <= 0) {
         log.push(logEntry(`${p.name}: efeito "${se.name}" expirou.`, "system"));
         return false;
@@ -242,11 +246,6 @@ export function tickStatusEffects(entity: Player | Monster, log: CombatEntry[], 
   if (isPlayer && p.classType === "druida" && p.attributes.hp > 0) {
     p.attributes.hp = clamp(p.attributes.hp + 4, 0, p.attributes.maxHp);
     log.push(logEntry(`🌿 ${p.name} regenerou 4 HP (Regeneração)`, "special"));
-  }
-
-  // Paladin passive: heal 6 HP to all allies
-  if (isPlayer && p.classType === "paladin" && p.attributes.hp > 0) {
-    // handled in processMonsterTurn for all players
   }
 }
 
@@ -375,6 +374,8 @@ function applySkillEffects(
   if (effectKey === "group_shield") {
     state.players.forEach(p => {
       if (p.attributes.hp > 0) {
+        // Remove old shield first, then add fresh one
+        p.statusEffects = p.statusEffects.filter(se => se.name !== "Escudo Divino");
         p.statusEffects.push({ id: nanoid(), name: "Escudo Divino", turnsLeft: 1, defenseBonus: 999 });
         p.attributes.hp = clamp(p.attributes.hp + 15, 0, p.attributes.maxHp);
       }
@@ -394,6 +395,8 @@ function applySkillEffects(
 
   if (effectKey === "berserker") {
     player.attributes.mp = 0;
+    // Remove old berserker rage before adding new one (no stacking)
+    player.statusEffects = player.statusEffects.filter(se => se.name !== "Fúria Berserker");
     player.statusEffects.push({ id: nanoid(), name: "Fúria Berserker", turnsLeft: 3, attackBonus: 12 });
     log.push(logEntry(`😡 ${player.name} entra em FÚRIA! +12 ATK por 3 turnos!`, "special"));
   }
@@ -405,7 +408,13 @@ function applySkillEffects(
   }
 
   if (effectKey === "evasion") {
-    player.statusEffects.push({ id: nanoid(), name: "Evasão", turnsLeft: 2, defenseBonus: 10 });
+    // Refresh duration if already active, don't stack
+    const existing = player.statusEffects.find(se => se.name === "Evasão");
+    if (existing) {
+      existing.turnsLeft = 2;
+    } else {
+      player.statusEffects.push({ id: nanoid(), name: "Evasão", turnsLeft: 2, defenseBonus: 10 });
+    }
     log.push(logEntry(`🌑 ${player.name} se funde às sombras! +10 DEF por 2 turnos.`, "special"));
   }
 
@@ -423,7 +432,13 @@ function applySkillEffects(
 
   if (effectKey === "group_attack_up") {
     state.players.filter(p => p.attributes.hp > 0).forEach(p => {
-      p.statusEffects.push({ id: nanoid(), name: "Grito de Guerra", turnsLeft: 2, attackBonus: 5 });
+      // Refresh if already active, don't stack
+      const existing = p.statusEffects.find(se => se.name === "Grito de Guerra");
+      if (existing) {
+        existing.turnsLeft = 2;
+      } else {
+        p.statusEffects.push({ id: nanoid(), name: "Grito de Guerra", turnsLeft: 2, attackBonus: 5 });
+      }
     });
     log.push(logEntry(`🪓 Grito de Guerra! Todo o grupo +5 ATK por 2 turnos!`, "special"));
   }
@@ -435,7 +450,9 @@ function applySkillEffects(
       target.hp = Math.max(0, target.hp - bonus);
       log.push(logEntry(`  ↳ Carnificina! Bônus de ${bonus} dano pela fúria!`, "special"));
     }
-    player.statusEffects.push({ id: nanoid(), name: "Atordoado", turnsLeft: 0, defenseBonus: 0 }); // stun target
+    // Stun the target for 1 turn (not the player)
+    // Note: monsters don't track statusEffects the same way, so just log it
+    log.push(logEntry(`  ↳ ${target.name} foi atordoado!`, "special"));
   }
 
   if (effectKey === "guaranteed_crit") {
@@ -488,13 +505,20 @@ export function processSingleMonsterAttack(
     log.push(logEntry(`💔 ${target.name} foi derrotado!`, "monster_attack"));
   }
 
-  // Berserker passive: gain ATK when hit
+  // Berserker passive: gain ATK when hit — single permanent effect that stacks up to +20
   if (target.classType === "berserker" && damage > 0 && target.attributes.hp > 0) {
-    const currentBonus = target.statusEffects.filter(se => se.name === "Ira do Sangue").reduce((s, se) => s + (se.attackBonus ?? 0), 0);
+    const existing = target.statusEffects.find(se => se.name === "Ira do Sangue");
+    const currentBonus = existing?.attackBonus ?? 0;
     if (currentBonus < 20) {
       const gainAtk = Math.min(2, 20 - currentBonus);
-      target.statusEffects.push({ id: nanoid(), name: "Ira do Sangue", turnsLeft: 999, attackBonus: gainAtk });
-      log.push(logEntry(`🪓 ${target.name} fica mais forte! +${gainAtk} ATK (Ira do Sangue)`, "special"));
+      if (existing) {
+        // Update the single existing entry
+        existing.attackBonus = (existing.attackBonus ?? 0) + gainAtk;
+      } else {
+        // Create the entry once, permanent (-1 = never expires)
+        target.statusEffects.push({ id: nanoid(), name: "Ira do Sangue", turnsLeft: -1, attackBonus: gainAtk });
+      }
+      log.push(logEntry(`🪓 ${target.name} fica mais forte! +${gainAtk} ATK (Ira do Sangue — total: ${currentBonus + gainAtk})`, "special"));
     }
   }
 }
@@ -508,7 +532,10 @@ export function processPlayerAction(
   const { skillId, targetId, itemId, comboActionId, partnerId } = opts;
   const log: CombatEntry[] = [];
   const player = state.players.find(p => p.id === playerId);
-  if (!player || player.hasActedThisTurn) return { state, newEntries: [] };
+  // combo_accept does NOT consume the turn, so allow it even if hasActedThisTurn somehow
+  // For everything else, block if already acted
+  if (!player) return { state, newEntries: [] };
+  if (actionType !== "combo_accept" && player.hasActedThisTurn) return { state, newEntries: [] };
 
   const mapDef = MAP_DEFINITIONS.find(m => m.id === state.currentMap)!;
   const manaMult = mapDef?.manaCostMultiplier ?? 1;
@@ -548,6 +575,7 @@ export function processPlayerAction(
   }
 
   // ── Combo Accept ───────────────────────────────────────────────────────────
+  // Accepting just marks partnerReady = true. The combo executes on the PARTNER's turn.
   if (actionType === "combo_accept") {
     const pendingCombo = state.pendingCombos.find(c => c.partnerId === playerId && !c.partnerReady);
     if (!pendingCombo) { log.push(logEntry(`❌ Nenhum combo pendente!`, "system")); return { state, newEntries: log }; }
@@ -559,22 +587,45 @@ export function processPlayerAction(
     const mpCost = Math.floor(comboAction.mpCostPerPlayer * manaMult);
 
     if (player.attributes.mp < mpCost) {
-      log.push(logEntry(`❌ Mana insuficiente para o combo!`, "system"));
+      log.push(logEntry(`❌ ${player.name} não tem mana para o combo!`, "system"));
       state.pendingCombos = state.pendingCombos.filter(c => c.id !== pendingCombo.id);
       proposer.pendingComboId = undefined;
       return { state, newEntries: log };
     }
 
-    // Both ready — execute combo NOW
+    // Just mark as accepted — combo fires on THIS player's turn in initiative
+    pendingCombo.partnerReady = true;
+    player.pendingComboId = pendingCombo.id;
+    log.push(logEntry(`🤝 ${player.name} aceitou o combo "${comboAction.name}"! Será executado no turno de ${player.name}.`, "combo"));
+    // Does NOT mark hasActedThisTurn — the player hasn't acted yet
+    return { state, newEntries: log };
+  }
+
+  // ── Combo Execute ──────────────────────────────────────────────────────────
+  // Called automatically when it's the accepting partner's turn and they have a ready combo
+  if (actionType === "combo_execute") {
+    const pendingCombo = state.pendingCombos.find(c => c.partnerId === playerId && c.partnerReady);
+    if (!pendingCombo) return { state, newEntries: [] };
+
+    const proposer = state.players.find(p => p.id === pendingCombo.proposerId);
+    if (!proposer) return { state, newEntries: [] };
+
+    const comboAction = COMBO_ACTIONS.find(c => c.id === pendingCombo.comboActionId)!;
+    const mpCost = Math.floor(comboAction.mpCostPerPlayer * manaMult);
+
     const comboTarget = pendingCombo.targetId
       ? allMonsters.find(m => m.id === pendingCombo.targetId && m.hp > 0)
       : allMonsters.find(m => m.hp > 0);
 
     if (!comboTarget) {
-      log.push(logEntry(`❌ Alvo inválido para o combo!`, "system"));
+      log.push(logEntry(`❌ Alvo do combo não existe mais!`, "system"));
       state.pendingCombos = state.pendingCombos.filter(c => c.id !== pendingCombo.id);
       proposer.pendingComboId = undefined;
       player.pendingComboId = undefined;
+      // Still consumes the player's turn
+      player.hasActedThisTurn = true;
+      const partInit = state.initiativeOrder.find(e => e.id === playerId);
+      if (partInit) partInit.acted = true;
       return { state, newEntries: log };
     }
 
@@ -598,7 +649,7 @@ export function processPlayerAction(
 
     if (comboTarget.hp <= 0) handleMonsterDeath(state, comboTarget, log);
 
-    // Mark initiative entries as acted
+    // Mark BOTH as acted — combo uses both players' actions
     const propInit = state.initiativeOrder.find(e => e.id === proposer.id);
     const partInit = state.initiativeOrder.find(e => e.id === player.id);
     if (propInit) propInit.acted = true;
