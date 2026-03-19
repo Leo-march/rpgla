@@ -20,7 +20,6 @@ export default function JoinScreen() {
     setJoined(true);
   };
 
-  // Show loading if joined but gameState not yet set
   if (joined && !gameState) {
     return (
       <div className="min-h-screen dungeon-bg flex items-center justify-center">
@@ -31,22 +30,19 @@ export default function JoinScreen() {
     );
   }
 
-  const availableClasses = CLASS_DEFINITIONS.filter((c) => c.unlockedByDefault);
+  // All classes are available from the start
+  const availableClasses = CLASS_DEFINITIONS;
 
   return (
     <div className="min-h-screen dungeon-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-2xl">
         {/* Title */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div className="text-6xl mb-3">⚔️</div>
-          <h1 className="font-display text-5xl text-dungeon-gold tracking-widest mb-2">
-            DUNGEON
-          </h1>
-          <h2 className="font-display text-2xl text-dungeon-text-dim tracking-widest">
-            CHRONICLES
-          </h2>
+          <h1 className="font-display text-5xl text-dungeon-gold tracking-widest mb-2">DUNGEON</h1>
+          <h2 className="font-display text-2xl text-dungeon-text-dim tracking-widest">CHRONICLES</h2>
           <p className="text-dungeon-text-dim text-sm mt-3 font-body italic">
-            RPG multijogador em tempo real · 4 aventureiros · 3 mapas
+            RPG multijogador em tempo real · 6 jogadores · 6 classes · Sistema de Combos
           </p>
         </div>
 
@@ -65,44 +61,41 @@ export default function JoinScreen() {
             </span>
           </div>
 
-          {/* Room ID */}
-          <div>
-            <label className="text-xs font-display text-dungeon-gold tracking-widest uppercase block mb-1">
-              Código da Sala
-            </label>
-            <input
-              type="text"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value.toUpperCase())}
-              placeholder="Ex: DUNGEON01"
-              maxLength={12}
-              className="w-full bg-dungeon-bg border border-dungeon-border text-dungeon-text
-                         px-3 py-2 font-mono text-sm focus:border-dungeon-gold outline-none
-                         placeholder:text-dungeon-text-dim/40 uppercase tracking-widest"
-            />
-            <p className="text-xs text-dungeon-text-dim mt-1">
-              Compartilhe o código com seus amigos para entrar na mesma sala
-            </p>
+          {/* Room + Name on same row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-display text-dungeon-gold tracking-widest uppercase block mb-1">
+                Código da Sala
+              </label>
+              <input
+                type="text"
+                value={roomId}
+                onChange={(e) => setRoomId(e.target.value.toUpperCase())}
+                placeholder="Ex: DUNGEON01"
+                maxLength={12}
+                className="w-full bg-dungeon-bg border border-dungeon-border text-dungeon-text
+                           px-3 py-2 font-mono text-sm focus:border-dungeon-gold outline-none
+                           placeholder:text-dungeon-text-dim/40 uppercase tracking-widest"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-display text-dungeon-gold tracking-widest uppercase block mb-1">
+                Nome do Personagem
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ex: Thorin"
+                maxLength={20}
+                className="w-full bg-dungeon-bg border border-dungeon-border text-dungeon-text
+                           px-3 py-2 font-mono text-sm focus:border-dungeon-gold outline-none
+                           placeholder:text-dungeon-text-dim/40"
+              />
+            </div>
           </div>
 
-          {/* Player name */}
-          <div>
-            <label className="text-xs font-display text-dungeon-gold tracking-widest uppercase block mb-1">
-              Nome do Personagem
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Thorin"
-              maxLength={20}
-              className="w-full bg-dungeon-bg border border-dungeon-border text-dungeon-text
-                         px-3 py-2 font-mono text-sm focus:border-dungeon-gold outline-none
-                         placeholder:text-dungeon-text-dim/40"
-            />
-          </div>
-
-          {/* Class selection */}
+          {/* Class selection — all 6 */}
           <div>
             <label className="text-xs font-display text-dungeon-gold tracking-widest uppercase block mb-2">
               Escolha sua Classe
@@ -112,12 +105,12 @@ export default function JoinScreen() {
                 <button
                   key={cls.id}
                   onClick={() => setClassType(cls.id)}
-                  className={`p-3 border rounded text-left transition-all duration-200
+                  className={`p-2.5 border rounded text-left transition-all duration-200
                     ${classType === cls.id
                       ? "border-dungeon-gold bg-dungeon-gold/10"
                       : "border-dungeon-border hover:border-dungeon-text-dim"}`}
                 >
-                  <div className="text-2xl mb-1">{cls.emoji}</div>
+                  <div className="text-xl mb-1">{cls.emoji}</div>
                   <div className="font-display text-xs text-dungeon-text">{cls.name}</div>
                   <div className="text-dungeon-text-dim text-xs mt-0.5 leading-tight line-clamp-2">
                     {cls.description}
@@ -161,7 +154,7 @@ export default function JoinScreen() {
         </div>
 
         <p className="text-center text-dungeon-text-dim text-xs mt-4 font-mono">
-          Novas classes são desbloqueadas ao derrotar chefes dos mapas
+          Todas as 6 classes disponíveis · 15 combos únicos entre classes
         </p>
       </div>
     </div>

@@ -4,7 +4,7 @@ export type ClassType = "warrior" | "mage" | "ranger" | "necromancer" | "paladin
 export type MapId = "forest" | "dungeon" | "abyss" | "volcano" | "cemetery" | "ice_castle" | "void";
 export type GamePhase = "lobby" | "map_select" | "playing" | "shop" | "game_over" | "victory";
 export type TurnPhase = "player_actions" | "processing" | "monster_turn" | "broadcast";
-export type ActionType = "attack" | "special" | "use_item" | "skip";
+export type ActionType = "attack" | "special" | "use_item" | "skip" | "combo_propose" | "combo_accept" | "combo_cancel" | "combo_execute";
 
 // ─── Attributes ──────────────────────────────────────────────────────────────
 
@@ -39,8 +39,31 @@ export interface Skill {
   mpCost: number;
   damageMultiplier: number;
   isSpecial: boolean;
-  // special effect key handled server-side
   effectKey?: string;
+}
+
+// ─── Combo Action ─────────────────────────────────────────────────────────────
+
+export interface ComboAction {
+  id: string;
+  name: string;
+  description: string;
+  requiredClasses: [ClassType, ClassType]; // pair of classes needed
+  mpCostPerPlayer: number;
+  damageMultiplier: number;
+  effectKey: string;
+  emoji: string;
+}
+
+export interface PendingCombo {
+  id: string;
+  proposerId: string;
+  partnerId: string; // empty = waiting for any partner
+  comboActionId: string;
+  targetId?: string;
+  proposerReady: boolean;
+  partnerReady: boolean;
+  expiresAt: number; // timestamp
 }
 
 // ─── Class Definition ─────────────────────────────────────────────────────────
@@ -60,7 +83,7 @@ export interface ClassDefinition {
 // ─── Player ──────────────────────────────────────────────────────────────────
 
 export interface Player {
-  id: string; // socket id
+  id: string;
   name: string;
   classType: ClassType;
   attributes: Attributes;
@@ -68,13 +91,13 @@ export interface Player {
   xp: number;
   xpToNext: number;
   inventory: Item[];
-  coins: number; // shared pot reflected here
+  coins: number;
   statusEffects: StatusEffect[];
   hasActedThisTurn: boolean;
   isConnected: boolean;
-  // Necromancer summon state
   summonActive: boolean;
   summonTurnsLeft: number;
+  pendingComboId?: string; // if player is in a pending combo
 }
 
 // ─── Status Effects ───────────────────────────────────────────────────────────
@@ -110,8 +133,8 @@ export interface MapDefinition {
   name: string;
   description: string;
   difficulty: "Iniciante" | "Intermediário" | "Avançado" | "Lendário";
-  defenseDebuff: number;   // multiplier, e.g. 0.8 = -20%
-  manaCostMultiplier: number; // e.g. 2 = double
+  defenseDebuff: number;
+  manaCostMultiplier: number;
   monsterLevel: number;
   monsters: Monster[];
   boss: Monster;
@@ -124,7 +147,7 @@ export interface CombatEntry {
   id: string;
   timestamp: number;
   message: string;
-  type: "player_attack" | "monster_attack" | "level_up" | "item" | "system" | "special";
+  type: "player_attack" | "monster_attack" | "level_up" | "item" | "system" | "special" | "combo";
 }
 
 // ─── Game State ───────────────────────────────────────────────────────────────
@@ -143,8 +166,9 @@ export interface GameState {
   combatLog: CombatEntry[];
   turnNumber: number;
   turnPhase: TurnPhase;
-  currentPlayerTurnIndex: number; // which player slot is acting
+  currentPlayerTurnIndex: number;
   roundWinner: null | "players" | "monsters";
+  pendingCombos: PendingCombo[];
 }
 
 // ─── Socket Events ────────────────────────────────────────────────────────────
@@ -161,7 +185,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   join_room: (data: { roomId: string; playerName: string; classType: ClassType }) => void;
   select_map: (mapId: MapId) => void;
-  player_action: (data: { actionType: ActionType; skillId?: string; targetId?: string; itemId?: string }) => void;
+  player_action: (data: { actionType: ActionType; skillId?: string; targetId?: string; itemId?: string; comboActionId?: string; partnerId?: string }) => void;
   buy_item: (itemId: string) => void;
   start_game: () => void;
   ready: () => void;

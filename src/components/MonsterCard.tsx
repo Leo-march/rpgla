@@ -9,17 +9,25 @@ interface MonsterCardProps {
 
 export default function MonsterCard({ monster, onSelect, selected }: MonsterCardProps) {
   const isDead = monster.hp <= 0;
-
   if (isDead) return null;
 
   return (
     <div
       onClick={() => onSelect?.(monster.id)}
-      className={`dungeon-card p-3 cursor-pointer transition-all duration-200
-        ${selected ? "border-dungeon-crimson-light glow-red" : "hover:border-dungeon-crimson"}
-        ${monster.isBoss ? "border-yellow-600 glow-gold animate-pulse-slow" : ""}
+      className={`dungeon-card p-3 cursor-pointer transition-all duration-200 relative
+        ${selected
+          ? "border-dungeon-gold glow-gold ring-1 ring-dungeon-gold/50"
+          : "hover:border-dungeon-crimson hover:shadow-md"}
+        ${monster.isBoss ? "border-yellow-600 animate-pulse-slow" : ""}
       `}
     >
+      {/* Target indicator */}
+      {selected && (
+        <div className="absolute -top-1.5 -right-1.5 bg-dungeon-gold text-dungeon-bg text-xs font-display px-1 rounded-full">
+          🎯
+        </div>
+      )}
+
       <div className="flex items-center gap-2 mb-2">
         <span className="text-3xl">{monster.emoji}</span>
         <div>

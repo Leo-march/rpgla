@@ -21,15 +21,22 @@ export default function BattleScreen() {
 
   const isBossFight = !!gameState.currentBoss && gameState.currentBoss.hp > 0;
 
+  // Auto-clear selected target if it died
+  const validTarget = selectedTarget && allMonsters.find((m) => m.id === selectedTarget)
+    ? selectedTarget
+    : allMonsters[0]?.id ?? null;
+
+  const handleTargetSelect = (id: string) => {
+    setSelectedTarget(id);
+  };
+
   return (
     <div className="h-screen dungeon-bg flex flex-col overflow-hidden">
       {/* Top bar */}
       <div className="border-b border-dungeon-border px-4 py-2 flex items-center justify-between flex-shrink-0">
         <div className="font-display text-dungeon-gold text-sm tracking-wide">
           ⚔️ {mapDef?.name ?? "Batalha"}
-          <span className="text-dungeon-text-dim text-xs ml-2">
-            · Rodada {gameState.turnNumber + 1}
-          </span>
+          <span className="text-dungeon-text-dim text-xs ml-2">· Rodada {gameState.turnNumber + 1}</span>
         </div>
         <div className="flex items-center gap-4 text-xs text-dungeon-text-dim font-mono">
           <span className={`font-display text-xs tracking-widest uppercase
@@ -44,19 +51,15 @@ export default function BattleScreen() {
               "text-purple-400 border border-purple-900"}`}>
             {mapDef?.difficulty}
           </span>
-          {mapDef && mapDef.defenseDebuff < 1 && (
-            <span className="text-red-400">🛡️-20%</span>
-          )}
-          {mapDef && mapDef.manaCostMultiplier > 1 && (
-            <span className="text-blue-400">💧×2</span>
-          )}
+          {mapDef && mapDef.defenseDebuff < 1 && <span className="text-red-400">🛡️-{Math.round((1 - mapDef.defenseDebuff) * 100)}%</span>}
+          {mapDef && mapDef.manaCostMultiplier > 1 && <span className="text-blue-400">💧×{mapDef.manaCostMultiplier}</span>}
         </div>
       </div>
 
-      {/* Main layout - fills remaining height */}
+      {/* Main layout */}
       <div className="flex flex-1 overflow-hidden min-h-0">
-        {/* Left: Players */}
-        <div className="w-52 flex-shrink-0 border-r border-dungeon-border p-2 overflow-y-auto space-y-2">
+        {/* Left: Players — wider to fit 6 cards */}
+        <div className="w-56 flex-shrink-0 border-r border-dungeon-border p-2 overflow-y-auto space-y-1.5">
           <div className="text-xs font-display text-dungeon-text-dim tracking-widest uppercase px-1 pb-1 border-b border-dungeon-border">
             Grupo
           </div>
@@ -70,12 +73,21 @@ export default function BattleScreen() {
           ))}
         </div>
 
-        {/* Center: Battle field + actions */}
+        {/* Center: Monsters + Actions */}
         <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-          {/* Monsters - scrollable if needed */}
+          {/* Monsters area */}
           <div className="flex-1 p-3 overflow-y-auto min-h-0">
-            <div className="text-xs font-display text-dungeon-text-dim tracking-widest uppercase mb-2">
-              {isBossFight ? "⚠️ Chefe" : "👹 Inimigos"}
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs font-display text-dungeon-text-dim tracking-widest uppercase">
+                {isBossFight ? "⚠️ Chefe" : "👹 Inimigos"}
+              </div>
+              {validTarget && (
+                <div className="text-xs text-dungeon-text-dim font-mono">
+                  🎯 Alvo: <span className="text-dungeon-gold">
+                    {allMonsters.find((m) => m.id === validTarget)?.name ?? "—"}
+                  </span>
+                </div>
+              )}
             </div>
 
             {allMonsters.length === 0 ? (
@@ -90,15 +102,15 @@ export default function BattleScreen() {
                   <MonsterCard
                     key={monster.id}
                     monster={monster}
-                    onSelect={setSelectedTarget}
-                    selected={selectedTarget === monster.id}
+                    onSelect={handleTargetSelect}
+                    selected={validTarget === monster.id}
                   />
                 ))}
               </div>
             )}
           </div>
 
-          {/* Action panel - fixed at bottom of center */}
+          {/* Action panel */}
           <div className="border-t border-dungeon-border p-2 flex-shrink-0">
             {me ? (
               <ActionPanel
@@ -106,6 +118,9 @@ export default function BattleScreen() {
                 monsters={gameState.monsters.filter((m) => m.hp > 0)}
                 boss={gameState.currentBoss}
                 mapManaMult={mapDef?.manaCostMultiplier ?? 1}
+                gameState={gameState}
+                selectedTarget={validTarget}
+                onTargetSelect={handleTargetSelect}
               />
             ) : (
               <div className="text-center text-dungeon-text-dim font-display text-sm py-2">

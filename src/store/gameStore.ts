@@ -13,12 +13,11 @@ interface GameStore {
   connectionError: string | null;
   isConnected: boolean;
 
-  // Actions
   connect: () => void;
   joinRoom: (roomId: string, name: string, classType: ClassType) => void;
   selectMap: (mapId: MapId) => void;
   startGame: () => void;
-  performAction: (actionType: ActionType, skillId?: string, targetId?: string, itemId?: string) => void;
+  performAction: (actionType: ActionType, opts?: { skillId?: string; targetId?: string; itemId?: string; comboActionId?: string; partnerId?: string }) => void;
   buyItem: (itemId: string) => void;
   ready: () => void;
   returnToMapSelect: () => void;
@@ -35,7 +34,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isConnected: false,
 
   connect: () => {
-    // Trigger socket API initialization
     fetch("/api/socket").finally(() => {
       const socket: AppSocket = io({
         path: "/api/socket",
@@ -78,29 +76,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     socket.emit("join_room", { roomId, playerName: name, classType });
   },
 
-  selectMap: (mapId) => {
-    get().socket?.emit("select_map", mapId);
+  selectMap: (mapId) => { get().socket?.emit("select_map", mapId); },
+  startGame: () => { get().socket?.emit("start_game"); },
+
+  performAction: (actionType, opts) => {
+    get().socket?.emit("player_action", { actionType, ...opts });
   },
 
-  startGame: () => {
-    get().socket?.emit("start_game");
-  },
-
-  performAction: (actionType, skillId, targetId, itemId) => {
-    get().socket?.emit("player_action", { actionType, skillId, targetId, itemId });
-  },
-
-  buyItem: (itemId) => {
-    get().socket?.emit("buy_item", itemId);
-  },
-
-  ready: () => {
-    get().socket?.emit("ready");
-  },
-
-  returnToMapSelect: () => {
-    get().socket?.emit("return_to_map_select");
-  },
+  buyItem: (itemId) => { get().socket?.emit("buy_item", itemId); },
+  ready: () => { get().socket?.emit("ready"); },
+  returnToMapSelect: () => { get().socket?.emit("return_to_map_select"); },
 
   disconnect: () => {
     get().socket?.disconnect();

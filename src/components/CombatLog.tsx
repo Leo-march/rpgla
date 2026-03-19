@@ -12,6 +12,7 @@ const TYPE_STYLES: Record<CombatEntry["type"], string> = {
   item: "text-blue-300",
   system: "text-dungeon-text-dim",
   special: "text-purple-400",
+  combo: "text-fuchsia-400 font-semibold",
 };
 
 export default function CombatLog({ entries }: CombatLogProps) {

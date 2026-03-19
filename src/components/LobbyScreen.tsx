@@ -1,21 +1,19 @@
 import { useState } from "react";
 import { useGameStore } from "@/store/gameStore";
 import { CLASS_DEFINITIONS, MAP_DEFINITIONS } from "@/data/gameData";
-import { ClassType, MapId } from "@/types/game";
+import { MapId } from "@/types/game";
 
 export default function LobbyScreen() {
   const { gameState, myPlayerId, selectMap, startGame, connectionError } = useGameStore();
-  const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
 
   if (!gameState) return null;
 
-  const me = gameState.players.find((p) => p.id === myPlayerId);
   const isLeader = gameState.players[0]?.id === myPlayerId;
   const canStart = gameState.players.length >= 1 && !!gameState.currentMap && isLeader;
 
   return (
     <div className="min-h-screen dungeon-bg p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="font-display text-4xl md:text-5xl text-dungeon-gold mb-2 tracking-wide">
@@ -24,7 +22,7 @@ export default function LobbyScreen() {
           <p className="text-dungeon-text-dim text-sm">
             Sala: <span className="text-dungeon-text font-mono">{gameState.roomId}</span>
             {" · "}
-            Jogadores: <span className="text-dungeon-gold">{gameState.players.length}/4</span>
+            Jogadores: <span className="text-dungeon-gold">{gameState.players.length}/6</span>
           </p>
           {isLeader && (
             <span className="text-xs text-yellow-400 font-display mt-1 block">👑 Você é o líder</span>
@@ -43,25 +41,28 @@ export default function LobbyScreen() {
             <h2 className="font-display text-dungeon-gold text-sm tracking-widest uppercase mb-3">
               👥 Jogadores na Sala
             </h2>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               {gameState.players.map((p, i) => {
                 const cls = CLASS_DEFINITIONS.find((c) => c.id === p.classType);
                 return (
                   <div key={p.id} className={`flex items-center gap-2 p-2 border rounded
                     ${p.id === myPlayerId ? "border-dungeon-gold" : "border-dungeon-border"}`}>
                     <span className="text-xl">{cls?.emoji}</span>
-                    <div>
-                      <span className="text-dungeon-text text-sm font-display">{p.name}</span>
-                      <span className="text-dungeon-text-dim text-xs ml-2">({cls?.name})</span>
-                      {i === 0 && <span className="text-yellow-400 text-xs ml-1">👑</span>}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className="text-dungeon-text text-sm font-display truncate">{p.name}</span>
+                        {i === 0 && <span className="text-yellow-400 text-xs flex-shrink-0">👑</span>}
+                      </div>
+                      <span className="text-dungeon-text-dim text-xs">{cls?.name}</span>
                     </div>
                   </div>
                 );
               })}
-              {Array.from({ length: 4 - gameState.players.length }).map((_, i) => (
+              {/* Empty slots */}
+              {Array.from({ length: 6 - gameState.players.length }).map((_, i) => (
                 <div key={i} className="flex items-center gap-2 p-2 border border-dashed border-dungeon-border rounded opacity-40">
                   <span className="text-xl">❓</span>
-                  <span className="text-dungeon-text-dim text-sm">Aguardando jogador...</span>
+                  <span className="text-dungeon-text-dim text-xs">Aguardando...</span>
                 </div>
               ))}
             </div>
@@ -70,9 +71,10 @@ export default function LobbyScreen() {
           {/* Map selection */}
           <div className="dungeon-card p-4">
             <h2 className="font-display text-dungeon-gold text-sm tracking-widest uppercase mb-3">
-              🗺️ Escolha o Mapa {!isLeader && <span className="text-dungeon-text-dim text-xs normal-case">(somente líder)</span>}
+              🗺️ Escolha o Mapa{" "}
+              {!isLeader && <span className="text-dungeon-text-dim text-xs normal-case">(somente líder)</span>}
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {MAP_DEFINITIONS.map((map) => (
                 <button
                   key={map.id}
@@ -86,7 +88,7 @@ export default function LobbyScreen() {
                 >
                   <div className="flex justify-between items-start">
                     <span className="font-display text-sm text-dungeon-text">{map.name}</span>
-                    <span className={`text-xs font-display
+                    <span className={`text-xs font-display flex-shrink-0 ml-2
                       ${map.difficulty === "Iniciante" ? "text-green-400" :
                         map.difficulty === "Intermediário" ? "text-yellow-400" :
                         map.difficulty === "Avançado" ? "text-red-400" :
@@ -94,13 +96,15 @@ export default function LobbyScreen() {
                       {map.difficulty}
                     </span>
                   </div>
-                  <p className="text-xs text-dungeon-text-dim mt-1">{map.description}</p>
-                  {map.defenseDebuff < 1 && (
-                    <span className="text-xs text-red-400">⚠️ -{Math.round((1 - map.defenseDebuff) * 100)}% Defesa</span>
-                  )}
-                  {map.manaCostMultiplier > 1 && (
-                    <span className="text-xs text-blue-400 ml-2">⚠️ Custo de Mana x{map.manaCostMultiplier}</span>
-                  )}
+                  <p className="text-xs text-dungeon-text-dim mt-0.5">{map.description}</p>
+                  <div className="flex gap-2 mt-1 flex-wrap">
+                    {map.defenseDebuff < 1 && (
+                      <span className="text-xs text-red-400">⚠️ -{Math.round((1 - map.defenseDebuff) * 100)}% DEF</span>
+                    )}
+                    {map.manaCostMultiplier > 1 && (
+                      <span className="text-xs text-blue-400">⚠️ Mana x{map.manaCostMultiplier}</span>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
@@ -108,8 +112,8 @@ export default function LobbyScreen() {
         </div>
 
         {/* Combat log preview */}
-        <div className="dungeon-card mt-4 p-3 max-h-32 overflow-y-auto">
-          {gameState.combatLog.slice(-8).map((entry) => (
+        <div className="dungeon-card mt-4 p-3 max-h-24 overflow-y-auto">
+          {gameState.combatLog.slice(-6).map((entry) => (
             <div key={entry.id} className="text-xs text-dungeon-text-dim font-mono leading-relaxed">
               {entry.message}
             </div>
@@ -117,7 +121,7 @@ export default function LobbyScreen() {
         </div>
 
         {/* Start button */}
-        {isLeader && (
+        {isLeader ? (
           <div className="text-center mt-6">
             <button
               onClick={startGame}
@@ -126,14 +130,14 @@ export default function LobbyScreen() {
                          hover:bg-dungeon-gold hover:text-dungeon-bg transition-all duration-200
                          disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {!gameState.currentMap
-                ? "🗺️ Selecione um mapa primeiro"
-                : "⚔️ Iniciar Aventura!"}
+              {!gameState.currentMap ? "🗺️ Selecione um mapa primeiro" : "⚔️ Iniciar Aventura!"}
             </button>
+            <p className="text-dungeon-text-dim text-xs mt-2">
+              Pode iniciar com {gameState.players.length} jogador{gameState.players.length !== 1 ? "es" : ""} (máximo 6)
+            </p>
           </div>
-        )}
-        {!isLeader && (
-          <p className="text-center text-dungeon-text-dim text-sm mt-4 font-display">
+        ) : (
+          <p className="text-center text-dungeon-text-dim text-sm mt-6 font-display">
             Aguardando o líder iniciar a partida...
           </p>
         )}

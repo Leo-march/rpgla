@@ -1,4 +1,4 @@
-import { ClassDefinition, MapDefinition, Item, Monster } from "@/types/game";
+import { ClassDefinition, MapDefinition, Item, Monster, ComboAction } from "@/types/game";
 
 // ─── Classes ─────────────────────────────────────────────────────────────────
 
@@ -55,8 +55,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     description: "Manipula os mortos para destruir seus inimigos.",
     passiveDescription: "Invocação: Ao agir, 35% de chance de invocar uma alma que adiciona +4 de dano por 3 turnos.",
     baseAttributes: { hp: 75, maxHp: 75, mp: 90, maxMp: 90, attack: 9, defense: 2 },
-    unlockedByDefault: false,
-    unlockBossMap: "forest",
+    unlockedByDefault: true,
     skills: [
       { id: "soul_drain", name: "Dreno de Alma", description: "Rouba HP do inimigo.", mpCost: 10, damageMultiplier: 1, isSpecial: false, effectKey: "lifesteal" },
       { id: "bone_spear", name: "Lança de Osso", description: "Projétil de osso afiado.", mpCost: 8, damageMultiplier: 1.3, isSpecial: false },
@@ -71,8 +70,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     description: "Guerreiro sagrado que cura aliados e causa dano divino.",
     passiveDescription: "Aura Sagrada: Cura 5 HP de todos os aliados ao início de cada turno.",
     baseAttributes: { hp: 100, maxHp: 100, mp: 60, maxMp: 60, attack: 7, defense: 5 },
-    unlockedByDefault: false,
-    unlockBossMap: "dungeon",
+    unlockedByDefault: true,
     skills: [
       { id: "holy_strike", name: "Golpe Sagrado", description: "Dano sagrado básico.", mpCost: 5, damageMultiplier: 1.1, isSpecial: false },
       { id: "heal", name: "Cura Divina", description: "Restaura 20 HP de um aliado.", mpCost: 15, damageMultiplier: 0, isSpecial: false, effectKey: "heal_ally" },
@@ -87,14 +85,184 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     description: "Veloz e letal, especialista em golpes críticos.",
     passiveDescription: "Sombra: Primeiros ataques em combate causam dano dobrado.",
     baseAttributes: { hp: 80, maxHp: 80, mp: 55, maxMp: 55, attack: 14, defense: 2 },
-    unlockedByDefault: false,
-    unlockBossMap: "abyss",
+    unlockedByDefault: true,
     skills: [
       { id: "backstab", name: "Facada pelas Costas", description: "Ataque rápido.", mpCost: 0, damageMultiplier: 1, isSpecial: false },
       { id: "shadow_strike", name: "Golpe das Sombras", description: "Ataque furtivo de alto dano.", mpCost: 10, damageMultiplier: 1.6, isSpecial: false },
       { id: "smoke_bomb", name: "Bomba de Fumaça", description: "Reduz chance de ser acertado.", mpCost: 8, damageMultiplier: 0, isSpecial: false, effectKey: "evasion" },
       { id: "death_mark", name: "Marca da Morte", description: "ESPECIAL: Mata instantaneamente inimigos abaixo de 25% HP.", mpCost: 40, damageMultiplier: 3, isSpecial: true, effectKey: "execute" },
     ],
+  },
+];
+
+// ─── Combo Actions ────────────────────────────────────────────────────────────
+// Each combo requires exactly 2 classes. All 15 class pairs are covered.
+
+export const COMBO_ACTIONS: ComboAction[] = [
+  // Warrior + Mage
+  {
+    id: "blazing_sword",
+    name: "Espada em Chamas",
+    description: "Guerreiro ataca enquanto Mago encanta a lâmina com fogo. Dano massivo em área.",
+    requiredClasses: ["warrior", "mage"],
+    mpCostPerPlayer: 20,
+    damageMultiplier: 3.5,
+    effectKey: "aoe_fire",
+    emoji: "🔥⚔️",
+  },
+  // Warrior + Ranger
+  {
+    id: "volley_cover",
+    name: "Cobertura de Flechas",
+    description: "Arqueiro dispara rajada enquanto Guerreiro protege. +DEF grupo + dano em área.",
+    requiredClasses: ["warrior", "ranger"],
+    mpCostPerPlayer: 15,
+    damageMultiplier: 2.8,
+    effectKey: "aoe_cover",
+    emoji: "🛡️🏹",
+  },
+  // Warrior + Necromancer
+  {
+    id: "bone_armor_crush",
+    name: "Esmagamento Ósseo",
+    description: "Necromante cobre o Guerreiro com ossos. Ataque brutal que ignora defesa.",
+    requiredClasses: ["warrior", "necromancer"],
+    mpCostPerPlayer: 18,
+    damageMultiplier: 3.2,
+    effectKey: "pierce_heavy",
+    emoji: "💀⚔️",
+  },
+  // Warrior + Paladin
+  {
+    id: "sacred_charge",
+    name: "Carga Sagrada",
+    description: "Paladin abençoa o Guerreiro. Ataque poderoso que cura o grupo.",
+    requiredClasses: ["warrior", "paladin"],
+    mpCostPerPlayer: 20,
+    damageMultiplier: 2.5,
+    effectKey: "heal_on_hit",
+    emoji: "✨⚔️",
+  },
+  // Warrior + Assassin
+  {
+    id: "death_dance",
+    name: "Dança da Morte",
+    description: "Guerreiro distrai enquanto Assassino desfere golpes letais por todos os lados.",
+    requiredClasses: ["warrior", "assassin"],
+    mpCostPerPlayer: 15,
+    damageMultiplier: 3.8,
+    effectKey: "multi_hit",
+    emoji: "🗡️⚔️",
+  },
+  // Mage + Ranger
+  {
+    id: "arcane_arrows",
+    name: "Flechas Arcanas",
+    description: "Mago encanta as flechas do Arqueiro com energia arcana. Dano mágico em todos.",
+    requiredClasses: ["mage", "ranger"],
+    mpCostPerPlayer: 22,
+    damageMultiplier: 3.0,
+    effectKey: "aoe_arcane",
+    emoji: "🔮🏹",
+  },
+  // Mage + Necromancer
+  {
+    id: "soul_storm",
+    name: "Tempestade de Almas",
+    description: "Necromante invoca almas que o Mago explode em energia caótica. Dano massivo AoE.",
+    requiredClasses: ["mage", "necromancer"],
+    mpCostPerPlayer: 30,
+    damageMultiplier: 4.0,
+    effectKey: "aoe_chaos",
+    emoji: "💀🔮",
+  },
+  // Mage + Paladin
+  {
+    id: "holy_nova",
+    name: "Nova Sagrada",
+    description: "Paladino canaliza luz divina amplificada pelo Mago. Dano sagrado + cura grupo.",
+    requiredClasses: ["mage", "paladin"],
+    mpCostPerPlayer: 25,
+    damageMultiplier: 2.8,
+    effectKey: "aoe_holy_heal",
+    emoji: "✨🔮",
+  },
+  // Mage + Assassin
+  {
+    id: "shadow_blink",
+    name: "Teletransporte Sombrio",
+    description: "Mago teletransporta o Assassino direto ao alvo para golpe mortal. Ignora defesa.",
+    requiredClasses: ["mage", "assassin"],
+    mpCostPerPlayer: 25,
+    damageMultiplier: 4.2,
+    effectKey: "teleport_strike",
+    emoji: "🗡️🔮",
+  },
+  // Ranger + Necromancer
+  {
+    id: "plagued_volley",
+    name: "Saraivada Pestilenta",
+    description: "Arqueiro dispara flechas envenenadas pelo Necromante. Dano + veneno em todos.",
+    requiredClasses: ["ranger", "necromancer"],
+    mpCostPerPlayer: 20,
+    damageMultiplier: 2.5,
+    effectKey: "aoe_poison",
+    emoji: "💀🏹",
+  },
+  // Ranger + Paladin
+  {
+    id: "blessed_shot",
+    name: "Tiro Abençoado",
+    description: "Paladino abençoa a flecha do Arqueiro. Dano sagrado + cura o Arqueiro.",
+    requiredClasses: ["ranger", "paladin"],
+    mpCostPerPlayer: 18,
+    damageMultiplier: 3.0,
+    effectKey: "holy_shot_heal",
+    emoji: "✨🏹",
+  },
+  // Ranger + Assassin
+  {
+    id: "pincer_attack",
+    name: "Ataque de Pinça",
+    description: "Arqueiro distrai de longe enquanto Assassino ataca pelas costas. Dano crítico garantido.",
+    requiredClasses: ["ranger", "assassin"],
+    mpCostPerPlayer: 18,
+    damageMultiplier: 3.6,
+    effectKey: "guaranteed_crit",
+    emoji: "🗡️🏹",
+  },
+  // Necromancer + Paladin
+  {
+    id: "life_drain_nova",
+    name: "Nova de Dreno Vital",
+    description: "Necromante drena vida enquanto Paladino distribui para o grupo. Cura massiva.",
+    requiredClasses: ["necromancer", "paladin"],
+    mpCostPerPlayer: 25,
+    damageMultiplier: 2.2,
+    effectKey: "group_lifesteal",
+    emoji: "💀✨",
+  },
+  // Necromancer + Assassin
+  {
+    id: "spectral_blade",
+    name: "Lâmina Espectral",
+    description: "Necromante torna o Assassino intangível. Golpe que atravessa qualquer defesa.",
+    requiredClasses: ["necromancer", "assassin"],
+    mpCostPerPlayer: 28,
+    damageMultiplier: 4.5,
+    effectKey: "phase_strike",
+    emoji: "💀🗡️",
+  },
+  // Paladin + Assassin
+  {
+    id: "divine_judgement",
+    name: "Julgamento Divino",
+    description: "Paladino julga enquanto Assassino executa. Mata inimigos com menos de 50% HP.",
+    requiredClasses: ["paladin", "assassin"],
+    mpCostPerPlayer: 30,
+    damageMultiplier: 3.5,
+    effectKey: "execute_50",
+    emoji: "✨🗡️",
   },
 ];
 
@@ -264,3 +432,13 @@ export const SHOP_ITEMS: Item[] = [
 // ─── XP Table ─────────────────────────────────────────────────────────────────
 
 export const XP_TO_NEXT_LEVEL = (level: number): number => level * 50 + 50;
+
+// ─── Combo Lookup ─────────────────────────────────────────────────────────────
+
+export function findComboForClasses(classA: string, classB: string): ComboAction | undefined {
+  return COMBO_ACTIONS.find(
+    (c) =>
+      (c.requiredClasses[0] === classA && c.requiredClasses[1] === classB) ||
+      (c.requiredClasses[0] === classB && c.requiredClasses[1] === classA)
+  );
+}
