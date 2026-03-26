@@ -73,6 +73,7 @@ function AttrTooltip({ attrKey }: { attrKey: string }) {
 export default function ShopPanel() {
   const { gameState, myPlayerId, buyItem, ready } = useGameStore();
   const [tab, setTab] = useState<"shop" | "inventory" | "stats">("shop");
+  const [search, setSearch] = useState(""); 
 
   if (!gameState) return null;
 
@@ -148,8 +149,9 @@ export default function ShopPanel() {
 
             {/* Items */}
             <div className="space-y-4 mb-6">
+              const [search, setSearch] = useState("");
               {ITEM_CATEGORIES.map(cat => {
-                const catItems = SHOP_ITEMS.filter(cat.filter);
+                const catItems = SHOP_ITEMS.filter(cat.filter).filter(i => i.name.toLowerCase().includes(search.toLowerCase()) || i.description.toLowerCase().includes(search.toLowerCase()));
                 if (catItems.length === 0) return null;
                 return (
                   <div key={cat.key}>
@@ -159,7 +161,8 @@ export default function ShopPanel() {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                       {catItems.map((item) => {
-                        const canBuy = (me?.coins ?? 0) >= item.cost && !myReady;
+                        const alreadyBought = me?.purchasedItems?.includes(item.id) ?? false;
+                        const canBuy = (me?.coins ?? 0) >= item.cost && !myReady && !alreadyBought;
                         return (
                           <div key={item.id} className={`dungeon-card p-3 flex flex-col gap-2 transition-all hover:border-dungeon-gold/50 ${canBuy ? "" : "opacity-60"}`}>
                             <div className="flex items-start justify-between gap-2">
@@ -182,7 +185,7 @@ export default function ShopPanel() {
                               disabled={!canBuy}
                               className="w-full text-xs py-1 border border-dungeon-gold/60 text-dungeon-gold hover:bg-dungeon-gold hover:text-dungeon-bg transition-all disabled:opacity-40 disabled:cursor-not-allowed font-display"
                             >
-                              {(me?.coins ?? 0) < item.cost ? "Sem moedas" : myReady ? "Pronto" : "Comprar"}
+                              {alreadyBought ? "✅ Comprado" : (me?.coins ?? 0) < item.cost ? "Sem moedas" : myReady ? "Pronto" : "Comprar"}
                             </button>
                           </div>
                         );

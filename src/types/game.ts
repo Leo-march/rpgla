@@ -107,6 +107,7 @@ export interface Player {
   xpToNext: number;
   inventory: Item[];
   coins: number;
+  purchasedItems: string[];
   statusEffects: StatusEffect[];
   hasActedThisTurn: boolean;
   isConnected: boolean;
@@ -182,6 +183,7 @@ export interface GameState {
   monsters: Monster[];
   currentBoss: Monster | null;
   bossDefeated: Record<MapId, boolean>;
+  unlockedMaps: MapId[];
   unlockedClasses: ClassType[];
   sharedCoins: number;
   shopItems: Item[];
