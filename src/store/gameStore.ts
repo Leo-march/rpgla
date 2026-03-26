@@ -1,94 +1,127 @@
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
-import { GameState, CombatEntry, ClientToServerEvents, ServerToClientEvents, ClassType, MapId, ActionType } from "@/types/game";
+import {
+  GameState,
+  ActionType,
+  ClassType,
+  MapId,
+  CombatEntry,
+  ServerToClientEvents,
+  ClientToServerEvents,
+} from "@/types/game";
 
-type AppSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
+type GameSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 interface GameStore {
-  socket: AppSocket | null;
+  socket: GameSocket | null;
+  isConnected: boolean;
+  connectionError: string | null;
   gameState: GameState | null;
   myPlayerId: string | null;
-  roomId: string | null;
   combatLog: CombatEntry[];
-  connectionError: string | null;
-  isConnected: boolean;
 
+  // Actions
   connect: () => void;
-  joinRoom: (roomId: string, name: string, classType: ClassType) => void;
+  disconnect: () => void;
+  joinRoom: (roomId: string, playerName: string, classType: ClassType) => void;
   selectMap: (mapId: MapId) => void;
   startGame: () => void;
-  performAction: (actionType: ActionType, opts?: { skillId?: string; targetId?: string; itemId?: string; comboActionId?: string; partnerId?: string }) => void;
+  playerAction: (
+    actionType: ActionType,
+    opts?: {
+      skillId?: string;
+      targetId?: string;
+      itemId?: string;
+      comboActionId?: string;
+      partnerId?: string;
+    }
+  ) => void;
   buyItem: (itemId: string) => void;
   ready: () => void;
   returnToMapSelect: () => void;
-  disconnect: () => void;
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
   socket: null,
+  isConnected: false,
+  connectionError: null,
   gameState: null,
   myPlayerId: null,
-  roomId: null,
   combatLog: [],
-  connectionError: null,
-  isConnected: false,
 
   connect: () => {
+    const existing = get().socket;
+    if (existing?.connected) return;
+
+    // Initialise the Next.js socket API route first
     fetch("/api/socket").finally(() => {
-      const socket: AppSocket = io({
+      const socket: GameSocket = io({
         path: "/api/socket",
         addTrailingSlash: false,
         transports: ["polling", "websocket"],
-        upgrade: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
       });
 
       socket.on("connect", () => {
-        set({ isConnected: true, myPlayerId: socket.id, connectionError: null });
+        set({ isConnected: true, connectionError: null, myPlayerId: socket.id });
       });
 
       socket.on("disconnect", () => {
         set({ isConnected: false });
       });
 
-      socket.on("game_state", (state) => {
+      socket.on("connect_error", (err) => {
+        set({ connectionError: err.message, isConnected: false });
+      });
+
+      socket.on("game_state", (state: GameState) => {
         set({ gameState: state });
       });
 
-      socket.on("combat_log_entry", (entry) => {
-        set((s) => ({ combatLog: [...s.combatLog.slice(-99), entry] }));
+      socket.on("combat_log_entry", (entry: CombatEntry) => {
+        set((s) => ({
+          combatLog: [...s.combatLog.slice(-199), entry],
+        }));
       });
 
-      socket.on("error", (msg) => {
+      socket.on("error", (msg: string) => {
         set({ connectionError: msg });
-        setTimeout(() => set({ connectionError: null }), 3000);
+        setTimeout(() => set({ connectionError: null }), 4000);
       });
 
       set({ socket });
     });
   },
 
-  joinRoom: (roomId, name, classType) => {
-    const { socket } = get();
-    if (!socket) return;
-    set({ roomId });
-    socket.emit("join_room", { roomId, playerName: name, classType });
+  disconnect: () => {
+    get().socket?.disconnect();
+    set({ socket: null, isConnected: false, gameState: null, myPlayerId: null });
   },
 
-  selectMap: (mapId) => { get().socket?.emit("select_map", mapId); },
-  startGame: () => { get().socket?.emit("start_game"); },
+  joinRoom: (roomId, playerName, classType) => {
+    get().socket?.emit("join_room", { roomId, playerName, classType });
+  },
 
-  performAction: (actionType, opts) => {
+  selectMap: (mapId) => {
+    get().socket?.emit("select_map", mapId);
+  },
+
+  startGame: () => {
+    get().socket?.emit("start_game");
+  },
+
+  playerAction: (actionType, opts = {}) => {
     get().socket?.emit("player_action", { actionType, ...opts });
   },
 
-  buyItem: (itemId) => { get().socket?.emit("buy_item", itemId); },
-  ready: () => { get().socket?.emit("ready"); },
-  returnToMapSelect: () => { get().socket?.emit("return_to_map_select"); },
+  buyItem: (itemId) => {
+    get().socket?.emit("buy_item", itemId);
+  },
 
-  disconnect: () => {
-    get().socket?.disconnect();
-    set({ socket: null, gameState: null, isConnected: false, roomId: null, myPlayerId: null });
+  ready: () => {
+    get().socket?.emit("ready");
+  },
+
+  returnToMapSelect: () => {
+    get().socket?.emit("return_to_map_select");
   },
 }));
