@@ -226,8 +226,40 @@ export const MAP_DEFINITIONS: MapDefinition[] = [
 ];
 
 export const SHOP_ITEMS: Item[] = [
-  { id: "iron_sword", name: "⚔️ Espada de Ferro", description: "+3 Ataque", cost: 28, attackBonus: 3, defenseBonus: 0, hpBonus: 0, mpBonus: 0 },
-  // ... adicione os outros itens aqui
+// ── Armas ──
+  { id: "iron_sword",     name: "⚔️ Espada de Ferro",    description: "+3 Ataque",                     cost:  28, attackBonus:  3, defenseBonus: 0, hpBonus:  0, mpBonus:  0 },
+  { id: "steel_blade",    name: "⚔️ Lâmina de Aço",      description: "+5 Ataque",                     cost:  50, attackBonus:  5, defenseBonus: 0, hpBonus:  0, mpBonus:  0 },
+  { id: "mithril_sword",  name: "⚔️ Espada de Mithril",  description: "+8 Ataque, +2 DEF",             cost:  95, attackBonus:  8, defenseBonus: 2, hpBonus:  0, mpBonus:  0 },
+  { id: "void_blade",     name: "🌌 Lâmina do Vazio",    description: "+12 Ataque",                    cost: 160, attackBonus: 12, defenseBonus: 0, hpBonus:  0, mpBonus:  0 },
+  // ── Armaduras ──
+  { id: "leather_armor",  name: "🛡️ Couro Reforçado",    description: "+3 Defesa",                     cost:  28, attackBonus: 0, defenseBonus:  3, hpBonus:  0, mpBonus:  0 },
+  { id: "steel_shield",   name: "🛡️ Escudo de Aço",      description: "+5 Defesa",                     cost:  50, attackBonus: 0, defenseBonus:  5, hpBonus:  0, mpBonus:  0 },
+  { id: "dragon_scale",   name: "🐉 Escama de Dragão",   description: "+7 Defesa, +15 HP",             cost:  90, attackBonus: 0, defenseBonus:  7, hpBonus: 15, mpBonus:  0 },
+  { id: "void_armor",     name: "🌌 Armadura do Vazio",  description: "+10 Defesa, +20 HP",            cost: 155, attackBonus: 0, defenseBonus: 10, hpBonus: 20, mpBonus:  0 },
+  // ── HP ──
+  { id: "health_potion",  name: "❤️ Poção de Vida",      description: "+30 HP Máximo",                 cost:  30, attackBonus: 0, defenseBonus: 0, hpBonus: 30, mpBonus:  0 },
+  { id: "elixir_hp",      name: "❤️ Elixir Vital",       description: "+55 HP Máximo",                 cost:  60, attackBonus: 0, defenseBonus: 0, hpBonus: 55, mpBonus:  0 },
+  { id: "life_crystal",   name: "💎 Cristal da Vida",    description: "+90 HP Máximo, +3 DEF",         cost: 120, attackBonus: 0, defenseBonus: 3, hpBonus: 90, mpBonus:  0 },
+  // ── MP ──
+  { id: "mana_crystal",   name: "💧 Cristal de Mana",    description: "+25 Mana Máxima",               cost:  28, attackBonus: 0, defenseBonus: 0, hpBonus:  0, mpBonus: 25 },
+  { id: "arcane_tome",    name: "📖 Tomo Arcano",        description: "+4 ATK, +40 Mana",              cost:  75, attackBonus: 4, defenseBonus: 0, hpBonus:  0, mpBonus: 40 },
+  { id: "mana_gem",       name: "💎 Gema de Mana",       description: "+70 Mana Máxima",               cost:  95, attackBonus: 0, defenseBonus: 0, hpBonus:  0, mpBonus: 70 },
+  // ── Híbridos ──
+  { id: "enchanted_blade",name: "✨ Lâmina Encantada",   description: "+5 ATK, +2 DEF",                cost:  65, attackBonus: 5, defenseBonus: 2, hpBonus:  0, mpBonus:  0 },
+  { id: "elixir_power",   name: "⚗️ Elixir de Força",   description: "+6 ATK, +4 DEF",                cost: 100, attackBonus: 6, defenseBonus: 4, hpBonus:  0, mpBonus:  0 },
+  { id: "war_band",       name: "💢 Bracelete de Guerra",description: "+4 ATK, +20 HP",                cost:  72, attackBonus: 4, defenseBonus: 0, hpBonus: 20, mpBonus:  0 },
+  { id: "sage_ring",      name: "💍 Anel do Sábio",      description: "+3 ATK, +35 MP",                cost:  72, attackBonus: 3, defenseBonus: 0, hpBonus:  0, mpBonus: 35 },
+  { id: "hero_pendant",   name: "🏅 Amuleto do Herói",   description: "+5 ATK, +5 DEF, +20 HP",        cost: 140, attackBonus: 5, defenseBonus: 5, hpBonus: 20, mpBonus:  0 },
+  { id: "arcane_gauntlets",name:"🧤 Manoplas Arcanas",   description: "+6 ATK, +30 MP, +10 HP",        cost: 145, attackBonus: 6, defenseBonus: 0, hpBonus: 10, mpBonus: 30 },
+  // ── Lendários ──
+  { id: "chaos_shard",    name: "💥 Fragmento do Caos",  description: "+10 ATK, +10 DEF, +30 HP",      cost: 220, attackBonus: 10, defenseBonus: 10, hpBonus: 30, mpBonus:  0 },
+  { id: "void_essence",   name: "🌌 Essência do Vazio",  description: "+8 ATK, +8 DEF, +50 MP",        cost: 220, attackBonus:  8, defenseBonus:  8, hpBonus:  0, mpBonus: 50 },
+  // ── Iniciativa ──
+  { id: "swift_boots",    name: "👟 Botas Velozes",      description: "+2 Iniciativa",                  cost:  35, attackBonus: 0, defenseBonus: 0, hpBonus: 0, mpBonus:  0, initiativeBonus: 2 },
+  { id: "hawk_eye",       name: "🦅 Olho de Falcão",     description: "+1 ATK, +3 Iniciativa",          cost:  65, attackBonus: 1, defenseBonus: 0, hpBonus: 0, mpBonus:  0, initiativeBonus: 3 },
+  { id: "shadow_cloak",   name: "🌑 Manto das Sombras",  description: "+2 DEF, +4 Iniciativa",          cost:  90, attackBonus: 0, defenseBonus: 2, hpBonus: 0, mpBonus:  0, initiativeBonus: 4 },
+  { id: "time_crystal",   name: "⌛ Cristal do Tempo",   description: "+3 ATK, +3 DEF, +5 Iniciativa", cost: 175, attackBonus: 3, defenseBonus: 3, hpBonus: 0, mpBonus:  0, initiativeBonus: 5 },
+  { id: "phantom_dagger", name: "🗡️ Adaga Fantasma",     description: "+4 ATK, +6 Iniciativa",          cost: 140, attackBonus: 4, defenseBonus: 0, hpBonus: 0, mpBonus:  0, initiativeBonus: 6 },
 ];
 
 export const XP_TO_NEXT_LEVEL = (level: number): number => level * 45 + 55;
