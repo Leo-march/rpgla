@@ -9,11 +9,8 @@ import {
   createInitialGameState,
   createPlayer,
   processPlayerAction,
-  processMonsterTurn,
   processSingleMonsterAttack,
-  processInitiativeActorAction,
   checkGameEnd,
-  checkAllPlayersActed,
   buyItem,
   spawnMonstersForMap,
   resetForNewMap,
@@ -59,7 +56,7 @@ function spawnNextWave(state: GameState): CombatEntry[] {
     state.currentBoss = { ...BOSSES[state.currentMap!], id: nanoid() };
     log.push({ id: nanoid(), timestamp: Date.now(), message: `⚠️ ${state.currentBoss.name} emerge das sombras! BOSS BATTLE!`, type: "system" });
   } else if (state.monsters.length === 0 && !state.currentBoss) {
-    state.monsters = spawnMonstersForMap(state.currentMap!);
+    state.monsters = spawnMonstersForMap(state.currentMap!, state.turnNumber);
     log.push({ id: nanoid(), timestamp: Date.now(), message: `🔁 Nova onda! (${state.monsters.length} inimigos)`, type: "system" });
   }
 
@@ -72,7 +69,9 @@ function startNewCombat(roomId: string) {
   const state = rooms[roomId];
   if (!state || state.phase !== "playing") return;
 
-  const noEnemies = state.monsters.filter(m => m.hp > 0).length === 0 && (!state.currentBoss || state.currentBoss.hp <= 0);
+  const noEnemies = state.monsters.filter(m => m.hp > 0).length === 0 
+                 && (!state.currentBoss || state.currentBoss.hp <= 0);
+
   if (noEnemies) {
     const spawnLogs = spawnNextWave(state);
     broadcastLog(roomId, spawnLogs);
@@ -316,7 +315,7 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
       const room = Object.values(rooms).find(r => r.players.some(p => p.id === socket.id));
       if (!room || room.players[0].id !== socket.id || !room.currentMap) return;
       room.phase = "playing";
-      room.monsters = spawnMonstersForMap(room.currentMap);
+      room.monsters = spawnMonstersForMap(room.currentMap!, room.turnNumber);
       room.players.forEach(p => (p.hasActedThisTurn = false));
       room.combatLog.push({ id: nanoid(), timestamp: Date.now(), message: `⚔️ A batalha começou! ${room.monsters.length} inimigo(s)!`, type: "system" });
       broadcast(room.roomId, room);
@@ -378,7 +377,7 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
         room.initiativeOrder = [];
         room.initiativeRolled = false;
         if (room.monsters.length === 0 && !room.currentBoss) {
-          room.monsters = spawnMonstersForMap(room.currentMap!);
+          room.monsters = spawnMonstersForMap(room.currentMap!, room.turnNumber);
         }
         room.combatLog.push({ id: nanoid(), timestamp: Date.now(), message: "⚔️ De volta à batalha!", type: "system" });
         broadcast(room.roomId, room);
@@ -413,7 +412,7 @@ export default function handler(req: NextApiRequest, res: ResWithSocket) {
               room.phase = "playing";
               room.players.forEach(p => (p.hasActedThisTurn = false));
               if (room.monsters.length === 0 && !room.currentBoss) {
-                room.monsters = spawnMonstersForMap(room.currentMap!);
+                room.monsters = spawnMonstersForMap(room.currentMap!, room.turnNumber);
               }
             }
             broadcast(room.roomId, room);
