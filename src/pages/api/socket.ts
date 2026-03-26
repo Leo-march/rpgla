@@ -1,14 +1,28 @@
 import { Server as HttpServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { nanoid } from "nanoid";                    // ← Adicione esta linha
+
 import { ServerToClientEvents, ClientToServerEvents, GameState, CombatEntry } from "@/types/game";
+
 import {
-  createInitialGameState, createPlayer, processPlayerAction,
-  processMonsterTurn, processSingleMonsterAttack, processInitiativeActorAction,
-  checkGameEnd, checkAllPlayersActed, buyItem, spawnMonstersForMap,
-  resetForNewMap, rollInitiative, getNextActorInInitiative, isRoundComplete,
-  regenManaEndOfRound, nanoid,
+  createInitialGameState,
+  createPlayer,
+  processPlayerAction,
+  processMonsterTurn,
+  processSingleMonsterAttack,
+  processInitiativeActorAction,
+  checkGameEnd,
+  checkAllPlayersActed,
+  buyItem,
+  spawnMonstersForMap,
+  resetForNewMap,
+  rollInitiative,
+  getNextActorInInitiative,
+  isRoundComplete,
+  regenManaEndOfRound,
 } from "@/lib/gameEngine";
+
 import { MAP_DEFINITIONS, BOSSES } from "@/data/gameData";
 
 type SocketServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
