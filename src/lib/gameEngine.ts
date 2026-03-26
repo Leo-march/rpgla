@@ -908,29 +908,60 @@ export function checkAllPlayersActed(state: GameState): boolean {
 export function buyItem(state: GameState, playerId: string, itemId: string): { state: GameState; newEntries: CombatEntry[] } {
   const log: CombatEntry[] = [];
   const player = state.players.find(p => p.id === playerId);
-  const item = SHOP_ITEMS.find(i => i.id === itemId);
+  const shopItem = SHOP_ITEMS.find(i => i.id === itemId);
 
-  if (!player || !item) return { state, newEntries: [] };
-  if (player.coins < item.cost) { log.push(logEntry("❌ Moedas insuficientes!", "system")); return { state, newEntries: log }; }
-
-  player.coins -= item.cost;
-  player.inventory.push({ ...item, id: nanoid() });
-  player.attributes.attack += item.attackBonus;
-  player.attributes.defense += item.defenseBonus;
-  player.attributes.maxHp += item.hpBonus;
-  player.attributes.hp = clamp(player.attributes.hp + item.hpBonus, 0, player.attributes.maxHp);
-  player.attributes.maxMp += item.mpBonus;
-  player.attributes.mp = clamp(player.attributes.mp + item.mpBonus, 0, player.attributes.maxMp);
-  if (item.initiativeBonus) {
-    player.attributes.initiativeBonus = (player.attributes.initiativeBonus ?? 0) + item.initiativeBonus;
+  if (!player) {
+    log.push(logEntry("❌ Jogador não encontrado.", "system"));
+    return { state, newEntries: log };
   }
 
-  log.push(logEntry(`🛒 ${player.name} comprou "${item.name}"! (${player.coins} moedas restantes)`, "item"));
+  if (!shopItem) {
+    log.push(logEntry("❌ Item não encontrado na loja.", "system"));
+    return { state, newEntries: log };
+  }
+
+  if (player.coins < shopItem.cost) {
+    log.push(logEntry(`❌ ${player.name} não tem ouro suficiente! Precisa de ${shopItem.cost} moedas.`, "system"));
+    return { state, newEntries: log };
+  }
+
+  // Deduz o ouro
+  player.coins -= shopItem.cost;
+
+  // Cria uma cópia do item para o inventário (com ID único)
+  const purchasedItem: Item = {
+    ...shopItem,
+    id: nanoid(), // ID único para o item no inventário
+  };
+
+  player.inventory.push(purchasedItem);
+
+  // Aplica os bônus permanentes
+  player.attributes.attack += shopItem.attackBonus || 0;
+  player.attributes.defense += shopItem.defenseBonus || 0;
+  player.attributes.maxHp += shopItem.hpBonus || 0;
+  player.attributes.hp = clamp(player.attributes.hp + (shopItem.hpBonus || 0), 0, player.attributes.maxHp);
+  
+  player.attributes.maxMp += shopItem.mpBonus || 0;
+  player.attributes.mp = clamp(player.attributes.mp + (shopItem.mpBonus || 0), 0, player.attributes.maxMp);
+
+  if (shopItem.initiativeBonus) {
+    player.attributes.initiativeBonus = (player.attributes.initiativeBonus || 0) + shopItem.initiativeBonus;
+  }
+
+  // Log de sucesso
+  log.push(logEntry(
+    `🛒 ${player.name} comprou **${shopItem.name}** por ${shopItem.cost} moedas!`, 
+    "item"
+  ));
+
+  log.push(logEntry(
+    `   ✅ +${shopItem.attackBonus} ATK | +${shopItem.defenseBonus} DEF | +${shopItem.hpBonus} HP | +${shopItem.mpBonus} MP`, 
+    "item"
+  ));
+
   return { state, newEntries: log };
 }
-
-export { nanoid };
-
 // ─── Reset for new map ────────────────────────────────────────────────────────
 
 export function resetForNewMap(state: GameState): GameState {
