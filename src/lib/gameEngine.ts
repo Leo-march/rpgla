@@ -590,13 +590,20 @@ export function resetForNewMap(state: GameState): GameState {
   return state;
 }
 export function checkGameEnd(state: GameState): "players" | "monsters" | null {
-  const allPlayersDead = state.players.every(p => p.attributes.hp <= 0);
-  const allMonstersDead =
-    state.monsters.every(m => m.hp <= 0) &&
-    (!state.currentBoss || state.currentBoss.hp <= 0);
+  // considera apenas jogadores conectados
+  const activePlayers = state.players.filter(p => p.isConnected);
+
+  // todos os jogadores ativos morreram
+  const allPlayersDead = activePlayers.length > 0 && activePlayers.every(p => p.attributes.hp <= 0);
+
+  // verifica se ainda existe algum inimigo vivo
+  const monstersAlive = state.monsters.some(m => m.hp > 0);
+  const bossAlive = state.currentBoss && state.currentBoss.hp > 0;
+
+  const allEnemiesDead = !monstersAlive && !bossAlive;
 
   if (allPlayersDead) return "monsters";
-  if (allMonstersDead) return "players";
+  if (allEnemiesDead) return "players";
 
   return null;
 }
