@@ -26,6 +26,7 @@ export interface Attributes {
   maxMp: number;
   attack: number;
   defense: number;
+  initiativeBonus: number; // flat bonus added to d20 initiative rolls
 }
 
 // ─── Items ───────────────────────────────────────────────────────────────────
@@ -39,6 +40,7 @@ export interface Item {
   defenseBonus: number;
   hpBonus: number;
   mpBonus: number;
+  initiativeBonus?: number; // flat bonus to initiative rolls
   hpRestore?: number;
   mpRestore?: number;
 }
@@ -119,10 +121,12 @@ export interface Player {
 export interface StatusEffect {
   id: string;
   name: string;
-  turnsLeft: number;
-  attackBonus?: number;
-  defenseBonus?: number;
-  damagePerTurn?: number;
+  turnsLeft: number;        // -1 = permanent for battle
+  attackBonus?: number;     // adds to player.attributes.attack when calculating damage
+  defenseBonus?: number;    // adds to effective defense; 999 = divine shield (blocks all)
+  damagePerTurn?: number;   // DoT applied at end of round
+  initiativeBonus?: number; // bonus to next initiative roll (consumed after use)
+  stunned?: boolean;        // entity skips its next action
 }
 
 // ─── Monster ─────────────────────────────────────────────────────────────────
@@ -139,7 +143,9 @@ export interface Monster {
   xpReward: number;
   coinReward: number;
   isBoss: boolean;
+  initiativeBonus?: number; // flat bonus added to monster initiative rolls
   initiativeRoll?: number;
+  stunned?: boolean;        // skips its next action when true
 }
 
 // ─── Map ─────────────────────────────────────────────────────────────────────

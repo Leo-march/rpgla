@@ -100,8 +100,8 @@ export default function JoinScreen() {
                       : "border-dungeon-border hover:border-dungeon-text-dim hover:bg-dungeon-surface"}`}>
                   <div className="text-2xl mb-1">{cls.emoji}</div>
                   <div className="font-display text-xs text-dungeon-text leading-tight">{cls.name}</div>
-                  {(cls.id === "druida" || cls.id === "berserker") && (
-                    <div className="text-xs text-purple-400 font-mono mt-0.5">✨ Novo</div>
+                  {(cls.baseAttributes.initiativeBonus ?? 0) > 0 && (
+                    <div className="text-xs text-purple-400 font-mono mt-0.5">⚡+{cls.baseAttributes.initiativeBonus}</div>
                   )}
                 </button>
               ))}
@@ -119,11 +119,14 @@ export default function JoinScreen() {
                 <div className="text-xs font-mono text-yellow-400 bg-yellow-950/30 px-2 py-1 rounded border border-yellow-900/50">
                   ⚡ {selectedClass.passiveDescription}
                 </div>
-                <div className="flex gap-3 text-xs font-mono text-dungeon-text-dim">
+                <div className="flex gap-3 text-xs font-mono text-dungeon-text-dim flex-wrap">
                   <span className="text-green-400">❤️ {selectedClass.baseAttributes.hp}</span>
                   <span className="text-blue-400">💧 {selectedClass.baseAttributes.mp}</span>
                   <span className="text-red-400">⚔️ {selectedClass.baseAttributes.attack}</span>
                   <span className="text-yellow-400">🛡️ {selectedClass.baseAttributes.defense}</span>
+                  {(selectedClass.baseAttributes.initiativeBonus ?? 0) > 0 && (
+                    <span className="text-purple-400">⚡ +{selectedClass.baseAttributes.initiativeBonus} INIT</span>
+                  )}
                 </div>
                 <div className="text-xs text-dungeon-text-dim">
                   <span className="text-purple-400 font-display">Skills: </span>
@@ -140,7 +143,7 @@ export default function JoinScreen() {
         </div>
 
         <p className="text-center text-dungeon-text-dim text-xs mt-4 font-mono">
-          8 classes · Sistema de Iniciativa d20 · Combos únicos entre classes
+          8 classes · Sistema de Iniciativa d20+bônus · Combos únicos · Mana regen por rodada
         </p>
       </div>
     </div>

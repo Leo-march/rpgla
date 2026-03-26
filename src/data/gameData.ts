@@ -9,7 +9,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     emoji: "⚔️",
     description: "Tanque de linha de frente com alta defesa e golpes brutais.",
     passiveDescription: "Escudo de Aço: 25% de chance de bloquear todo dano recebido.",
-    baseAttributes: { hp: 130, maxHp: 130, mp: 40, maxMp: 40, attack: 9, defense: 7 },
+    baseAttributes: { hp: 130, maxHp: 130, mp: 40, maxMp: 40, attack: 9, defense: 7, initiativeBonus: 0 },
     unlockedByDefault: true,
     skills: [
       { id: "slash", name: "Golpe Largo", description: "Ataque padrão com espada.", mpCost: 0, damageMultiplier: 1.1, isSpecial: false },
@@ -24,7 +24,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     emoji: "🔮",
     description: "Mestre dos elementos com dano altíssimo, mas frágil.",
     passiveDescription: "Amplificação Arcana: 30% de chance de causar dano dobrado em magias.",
-    baseAttributes: { hp: 75, maxHp: 75, mp: 120, maxMp: 120, attack: 13, defense: 2 },
+    baseAttributes: { hp: 75, maxHp: 75, mp: 120, maxMp: 120, attack: 13, defense: 2, initiativeBonus: 0 },
     unlockedByDefault: true,
     skills: [
       { id: "fireball", name: "Bola de Fogo", description: "Projétil de fogo básico.", mpCost: 8, damageMultiplier: 1.3, isSpecial: false },
@@ -39,7 +39,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     emoji: "🏹",
     description: "Especialista em ataques precisos e sangramento.",
     passiveDescription: "Olho de Falcão: Críticos (dado 17-20) causam dano triplo.",
-    baseAttributes: { hp: 90, maxHp: 90, mp: 60, maxMp: 60, attack: 11, defense: 4 },
+    baseAttributes: { hp: 90, maxHp: 90, mp: 60, maxMp: 60, attack: 11, defense: 4, initiativeBonus: 2 },
     unlockedByDefault: true,
     skills: [
       { id: "arrow_shot", name: "Flecha Precisa", description: "Tiro básico de arco.", mpCost: 0, damageMultiplier: 1.1, isSpecial: false },
@@ -54,7 +54,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     emoji: "💀",
     description: "Manipula os mortos para destruir seus inimigos.",
     passiveDescription: "Invocação: 40% de chance de invocar alma ao agir (+5 dano por 3 turnos).",
-    baseAttributes: { hp: 80, maxHp: 80, mp: 100, maxMp: 100, attack: 10, defense: 3 },
+    baseAttributes: { hp: 80, maxHp: 80, mp: 100, maxMp: 100, attack: 10, defense: 3, initiativeBonus: 0 },
     unlockedByDefault: true,
     skills: [
       { id: "soul_drain", name: "Dreno de Alma", description: "Rouba HP do inimigo.", mpCost: 10, damageMultiplier: 1.1, isSpecial: false, effectKey: "lifesteal" },
@@ -69,7 +69,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     emoji: "🛡️",
     description: "Guerreiro sagrado que cura aliados e causa dano divino.",
     passiveDescription: "Aura Sagrada: Cura 6 HP de todos os aliados no início de cada turno.",
-    baseAttributes: { hp: 110, maxHp: 110, mp: 70, maxMp: 70, attack: 8, defense: 6 },
+    baseAttributes: { hp: 110, maxHp: 110, mp: 70, maxMp: 70, attack: 8, defense: 6, initiativeBonus: 0 },
     unlockedByDefault: true,
     skills: [
       { id: "holy_strike", name: "Golpe Sagrado", description: "Dano sagrado básico.", mpCost: 5, damageMultiplier: 1.2, isSpecial: false },
@@ -84,7 +84,7 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
     emoji: "🗡️",
     description: "Veloz e letal, especialista em golpes críticos e execuções.",
     passiveDescription: "Sombra: Primeiros ataques em cada alvo causam dano dobrado.",
-    baseAttributes: { hp: 85, maxHp: 85, mp: 65, maxMp: 65, attack: 15, defense: 3 },
+    baseAttributes: { hp: 85, maxHp: 85, mp: 65, maxMp: 65, attack: 15, defense: 3, initiativeBonus: 4 },
     unlockedByDefault: true,
     skills: [
       { id: "backstab", name: "Facada pelas Costas", description: "Ataque rápido e preciso.", mpCost: 0, damageMultiplier: 1.1, isSpecial: false },
@@ -93,14 +93,13 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
       { id: "death_mark", name: "Marca da Morte", description: "ESPECIAL: Executa inimigos abaixo de 30% HP.", mpCost: 45, damageMultiplier: 3.2, isSpecial: true, effectKey: "execute" },
     ],
   },
-  // ─── NEW CLASS: Druid ──────────────────────────────────────────────────────
   {
     id: "druida",
     name: "Druida",
     emoji: "🌿",
     description: "Guardião da natureza. Cura, venenos e transformações.",
     passiveDescription: "Regeneração: Recupera 4 HP a cada turno automaticamente.",
-    baseAttributes: { hp: 95, maxHp: 95, mp: 90, maxMp: 90, attack: 9, defense: 5 },
+    baseAttributes: { hp: 95, maxHp: 95, mp: 90, maxMp: 90, attack: 9, defense: 5, initiativeBonus: 1 },
     unlockedByDefault: true,
     skills: [
       { id: "thorn_whip", name: "Chicote de Espinhos", description: "Causa dano e envenena o alvo.", mpCost: 0, damageMultiplier: 1.0, isSpecial: false, effectKey: "poison" },
@@ -109,14 +108,13 @@ export const CLASS_DEFINITIONS: ClassDefinition[] = [
       { id: "feral_form", name: "Forma Selvagem", description: "ESPECIAL: Transforma-se em fera — ×2.5 dano e AoE.", mpCost: 45, damageMultiplier: 2.5, isSpecial: true, effectKey: "aoe" },
     ],
   },
-  // ─── NEW CLASS: Berserker ──────────────────────────────────────────────────
   {
     id: "berserker",
     name: "Berserker",
     emoji: "🪓",
     description: "Guerreiro selvagem que cresce mais forte com cada golpe recebido.",
     passiveDescription: "Ira do Sangue: Ao receber dano, +2 ATK permanente até o fim da batalha (máx +20).",
-    baseAttributes: { hp: 115, maxHp: 115, mp: 35, maxMp: 35, attack: 12, defense: 3 },
+    baseAttributes: { hp: 115, maxHp: 115, mp: 35, maxMp: 35, attack: 12, defense: 3, initiativeBonus: 0 },
     unlockedByDefault: true,
     skills: [
       { id: "axe_swing", name: "Machada em Arco", description: "Golpe selvagem com machado.", mpCost: 0, damageMultiplier: 1.2, isSpecial: false },
@@ -145,7 +143,6 @@ export const COMBO_ACTIONS: ComboAction[] = [
   { id: "life_drain_nova", name: "Nova de Dreno Vital", description: "Drena vida e distribui para o grupo. Cura massiva.", requiredClasses: ["necromancer", "paladin"], mpCostPerPlayer: 25, damageMultiplier: 2.2, effectKey: "group_lifesteal", emoji: "💀✨" },
   { id: "spectral_blade", name: "Lâmina Espectral", description: "Assassino intangível. Atravessa qualquer defesa.", requiredClasses: ["necromancer", "assassin"], mpCostPerPlayer: 28, damageMultiplier: 4.5, effectKey: "phase_strike", emoji: "💀🗡️" },
   { id: "divine_judgement", name: "Julgamento Divino", description: "Paladino julga, Assassino executa. Mata abaixo de 50% HP.", requiredClasses: ["paladin", "assassin"], mpCostPerPlayer: 30, damageMultiplier: 3.5, effectKey: "execute_50", emoji: "✨🗡️" },
-  // Druid combos
   { id: "nature_lightning", name: "Relâmpago da Natureza", description: "Druida canaliza trovão pelo Mago. Elétrico AoE.", requiredClasses: ["druida", "mage"], mpCostPerPlayer: 22, damageMultiplier: 3.2, effectKey: "aoe_arcane", emoji: "🌿🔮" },
   { id: "thorn_volley", name: "Saraivada de Espinhos", description: "Arqueiro dispara flechas encantadas com veneno da natureza.", requiredClasses: ["druida", "ranger"], mpCostPerPlayer: 18, damageMultiplier: 2.8, effectKey: "aoe_poison", emoji: "🌿🏹" },
   { id: "life_strike", name: "Golpe Vital", description: "Guerreiro ataca e Druida drena vida para curar o grupo.", requiredClasses: ["druida", "warrior"], mpCostPerPlayer: 18, damageMultiplier: 2.6, effectKey: "heal_on_hit", emoji: "🌿⚔️" },
@@ -153,7 +150,6 @@ export const COMBO_ACTIONS: ComboAction[] = [
   { id: "divine_bloom", name: "Florescer Divino", description: "Cura massiva do grupo + dano sagrado em área.", requiredClasses: ["druida", "paladin"], mpCostPerPlayer: 25, damageMultiplier: 1.8, effectKey: "aoe_holy_heal", emoji: "🌿✨" },
   { id: "shadow_vines", name: "Trepadeiras Sombrias", description: "Druida imobiliza, Assassino executa. Crítico garantido.", requiredClasses: ["druida", "assassin"], mpCostPerPlayer: 20, damageMultiplier: 3.8, effectKey: "guaranteed_crit", emoji: "🌿🗡️" },
   { id: "feral_rage", name: "Fúria Selvagem", description: "Druida e Berserker em forma animal. Triplo AoE brutal.", requiredClasses: ["druida", "berserker"], mpCostPerPlayer: 25, damageMultiplier: 3.5, effectKey: "aoe_fire", emoji: "🌿🪓" },
-  // Berserker combos
   { id: "thunder_axe", name: "Machada do Trovão", description: "Mago encanta a machada com raios. AoE elétrico devastador.", requiredClasses: ["berserker", "mage"], mpCostPerPlayer: 22, damageMultiplier: 3.6, effectKey: "aoe_arcane", emoji: "🪓🔮" },
   { id: "war_arrows", name: "Flechas de Guerra", description: "Arqueiro guia Berserker para alvos críticos. Duplo crítico.", requiredClasses: ["berserker", "ranger"], mpCostPerPlayer: 18, damageMultiplier: 3.2, effectKey: "guaranteed_crit", emoji: "🪓🏹" },
   { id: "blood_shield", name: "Escudo de Sangue", description: "Guerreiro e Berserker combinam força. Dano massivo + tankando.", requiredClasses: ["berserker", "warrior"], mpCostPerPlayer: 16, damageMultiplier: 3.4, effectKey: "multi_hit", emoji: "🪓⚔️" },
@@ -162,115 +158,121 @@ export const COMBO_ACTIONS: ComboAction[] = [
   { id: "shadow_frenzy", name: "Frenesi das Sombras", description: "Berserker e Assassino — puro caos. Executa abaixo de 40% HP.", requiredClasses: ["berserker", "assassin"], mpCostPerPlayer: 22, damageMultiplier: 4.0, effectKey: "execute_50", emoji: "🪓🗡️" },
 ];
 
-// ─── Monsters (Balanceados por nível relativo) ────────────────────────────────
-// Fórmula: HP = baseHP * (1 + 0.12 * level), ATK/DEF escalam suavemente
+// ─── Monsters ─────────────────────────────────────────────────────────────────
 
 const makeMonster = (
   id: string, name: string, emoji: string, level: number,
   hp: number, attack: number, defense: number,
-  xp: number, coins: number, isBoss = false
-): Monster => ({ id, name, emoji, level, hp, maxHp: hp, attack, defense, xpReward: xp, coinReward: coins, isBoss });
+  xp: number, coins: number, isBoss = false,
+  initiativeBonus = 0
+): Monster => ({ id, name, emoji, level, hp, maxHp: hp, attack, defense, xpReward: xp, coinReward: coins, isBoss, initiativeBonus });
 
 export const MONSTER_POOLS: Record<string, Monster[]> = {
   forest: [
-    makeMonster("goblin", "Goblin", "👺", 1, 38, 5, 1, 18, 22),
-    makeMonster("wolf", "Lobo Sombrio", "🐺", 1, 32, 6, 1, 15, 18),
-    makeMonster("slime", "Lodo Verde", "🟢", 1, 50, 4, 3, 12, 15),
-    makeMonster("bandit", "Bandido", "🦹", 2, 45, 7, 2, 20, 28),
-    makeMonster("forest_troll", "Troll da Floresta", "👹", 2, 60, 6, 3, 22, 30),
+    makeMonster("goblin",       "Goblin",            "👺", 1, 38,  5,  1, 18, 22, false, 1),
+    makeMonster("wolf",         "Lobo Sombrio",      "🐺", 1, 32,  6,  1, 15, 18, false, 3),
+    makeMonster("slime",        "Lodo Verde",        "🟢", 1, 50,  4,  3, 12, 15, false, 0),
+    makeMonster("bandit",       "Bandido",           "🦹", 2, 45,  7,  2, 20, 28, false, 2),
+    makeMonster("forest_troll", "Troll da Floresta", "👹", 2, 60,  6,  3, 22, 30, false, 0),
   ],
   dungeon: [
-    makeMonster("skeleton", "Esqueleto", "💀", 4, 70, 9, 3, 32, 38),
-    makeMonster("zombie", "Zumbi", "🧟", 4, 90, 7, 4, 30, 35),
-    makeMonster("dark_knight", "Cavaleiro Negro", "🖤", 5, 80, 11, 5, 38, 44),
-    makeMonster("wraith", "Espectro", "👻", 4, 60, 13, 2, 35, 42),
-    makeMonster("trap_golem", "Golem de Pedra", "🗿", 5, 100, 8, 7, 40, 46),
+    makeMonster("skeleton",   "Esqueleto",        "💀", 4, 70,  9,  3, 32, 38, false, 1),
+    makeMonster("zombie",     "Zumbi",            "🧟", 4, 90,  7,  4, 30, 35, false, -1),
+    makeMonster("dark_knight","Cavaleiro Negro",  "🖤", 5, 80, 11,  5, 38, 44, false, 2),
+    makeMonster("wraith",     "Espectro",         "👻", 4, 60, 13,  2, 35, 42, false, 4),
+    makeMonster("trap_golem", "Golem de Pedra",   "🗿", 5,100,  8,  7, 40, 46, false, -2),
   ],
   abyss: [
-    makeMonster("demon", "Demônio", "😈", 7, 110, 14, 6, 55, 65),
-    makeMonster("lava_golem", "Golem de Lava", "🔥", 8, 135, 11, 9, 65, 75),
-    makeMonster("void_spawn", "Filho do Vazio", "⚫", 7, 95, 16, 5, 60, 70),
-    makeMonster("infernal_hound", "Cão Infernal", "🐕", 7, 85, 17, 4, 58, 68),
+    makeMonster("demon",         "Demônio",         "😈", 7,110, 14,  6, 55, 65, false, 3),
+    makeMonster("lava_golem",    "Golem de Lava",   "🔥", 8,135, 11,  9, 65, 75, false, -1),
+    makeMonster("void_spawn",    "Filho do Vazio",  "⚫", 7, 95, 16,  5, 60, 70, false, 2),
+    makeMonster("infernal_hound","Cão Infernal",    "🐕", 7, 85, 17,  4, 58, 68, false, 5),
   ],
   volcano: [
-    makeMonster("fire_elemental", "Elemental de Fogo", "🌋", 9, 120, 15, 6, 72, 82),
-    makeMonster("magma_crab", "Caranguejo de Magma", "🦀", 9, 145, 12, 10, 68, 78),
-    makeMonster("ash_wraith", "Espectro de Cinzas", "🌑", 10, 100, 19, 4, 78, 88),
-    makeMonster("inferno_hound2", "Hound do Inferno", "🐕‍🦺", 10, 115, 18, 7, 82, 92),
+    makeMonster("fire_elemental","Elemental de Fogo", "🌋", 9,120, 15,  6, 72, 82, false, 2),
+    makeMonster("magma_crab",   "Caranguejo de Magma","🦀", 9,145, 12, 10, 68, 78, false, -2),
+    makeMonster("ash_wraith",   "Espectro de Cinzas", "🌑",10,100, 19,  4, 78, 88, false, 5),
+    makeMonster("inferno_hound2","Hound do Inferno",  "🐕‍🦺",10,115, 18,  7, 82, 92, false, 4),
   ],
   cemetery: [
-    makeMonster("banshee", "Banshee", "👁️", 12, 130, 18, 5, 88, 98),
-    makeMonster("grave_golem", "Golem Tumular", "🪨", 12, 175, 14, 13, 92, 102),
-    makeMonster("lich_minion", "Servo do Lich", "🦴", 12, 115, 21, 4, 90, 100),
-    makeMonster("death_knight2", "Cavaleiro da Morte", "☠️", 13, 160, 20, 9, 96, 110),
+    makeMonster("banshee",      "Banshee",           "👁️",12,130, 18,  5, 88, 98, false, 6),
+    makeMonster("grave_golem",  "Golem Tumular",     "🪨",12,175, 14, 13, 92,102, false, -3),
+    makeMonster("lich_minion",  "Servo do Lich",     "🦴",12,115, 21,  4, 90,100, false, 3),
+    makeMonster("death_knight2","Cavaleiro da Morte","☠️",13,160, 20,  9, 96,110, false, 4),
   ],
   ice_castle: [
-    makeMonster("frost_golem", "Golem de Gelo", "🧊", 14, 190, 18, 14, 108, 120),
-    makeMonster("ice_witch", "Bruxa do Gelo", "🧙‍♀️", 14, 145, 25, 7, 115, 125),
-    makeMonster("frozen_knight", "Cavaleiro Congelado", "🛡️", 15, 210, 16, 16, 112, 122),
-    makeMonster("blizzard_spirit", "Espírito da Nevasca", "❄️", 14, 125, 28, 5, 118, 128),
+    makeMonster("frost_golem",    "Golem de Gelo",       "🧊",14,190, 18, 14,108,120, false, -2),
+    makeMonster("ice_witch",      "Bruxa do Gelo",       "🧙‍♀️",14,145, 25,  7,115,125, false, 5),
+    makeMonster("frozen_knight",  "Cavaleiro Congelado", "🛡️",15,210, 16, 16,112,122, false, 0),
+    makeMonster("blizzard_spirit","Espírito da Nevasca", "❄️",14,125, 28,  5,118,128, false, 7),
   ],
   void: [
-    makeMonster("void_reaper", "Ceifador do Vazio", "🌀", 16, 210, 28, 10, 130, 148),
-    makeMonster("shadow_titan", "Titã das Sombras", "👤", 17, 260, 24, 15, 142, 160),
-    makeMonster("chaos_spawn", "Engendro do Caos", "💥", 16, 175, 32, 7, 136, 155),
-    makeMonster("void_knight", "Cavaleiro do Vazio", "🌌", 17, 240, 26, 13, 138, 158),
+    makeMonster("void_reaper",  "Ceifador do Vazio","🌀",16,210, 28, 10,130,148, false, 5),
+    makeMonster("shadow_titan", "Titã das Sombras", "👤",17,260, 24, 15,142,160, false, 2),
+    makeMonster("chaos_spawn",  "Engendro do Caos", "💥",16,175, 32,  7,136,155, false, 8),
+    makeMonster("void_knight",  "Cavaleiro do Vazio","🌌",17,240, 26, 13,138,158, false, 4),
   ],
 };
 
 export const BOSSES: Record<string, Monster> = {
-  forest: makeMonster("forest_boss", "Rei Goblin", "👑", 3, 280, 12, 5, 120, 180, true),
-  dungeon: makeMonster("dungeon_boss", "Lich Ancião", "🧙", 6, 480, 20, 9, 250, 350, true),
-  abyss: makeMonster("abyss_boss", "Senhor do Abismo", "🌑", 9, 720, 28, 14, 520, 750, true),
-  volcano: makeMonster("volcano_boss", "Dragão de Lava", "🐉", 11, 950, 33, 16, 720, 980, true),
-  cemetery: makeMonster("cemetery_boss", "Rei dos Mortos", "💀", 13, 1150, 38, 18, 880, 1200, true),
-  ice_castle: makeMonster("ice_boss", "Rainha Gélida", "👸", 15, 1350, 42, 22, 1050, 1450, true),
-  void: makeMonster("void_boss", "Deus do Vazio", "🌌", 18, 1900, 52, 28, 1600, 2100, true),
+  forest:    makeMonster("forest_boss",   "Rei Goblin",       "👑",  3,  280, 12,  5, 120,  180, true, 3),
+  dungeon:   makeMonster("dungeon_boss",  "Lich Ancião",      "🧙",  6,  480, 20,  9, 250,  350, true, 5),
+  abyss:     makeMonster("abyss_boss",    "Senhor do Abismo", "🌑",  9,  720, 28, 14, 520,  750, true, 6),
+  volcano:   makeMonster("volcano_boss",  "Dragão de Lava",   "🐉", 11,  950, 33, 16, 720,  980, true, 4),
+  cemetery:  makeMonster("cemetery_boss", "Rei dos Mortos",   "💀", 13, 1150, 38, 18, 880, 1200, true, 7),
+  ice_castle:makeMonster("ice_boss",      "Rainha Gélida",    "👸", 15, 1350, 42, 22,1050, 1450, true, 6),
+  void:      makeMonster("void_boss",     "Deus do Vazio",    "🌌", 18, 1900, 52, 28,1600, 2100, true, 9),
 };
 
 // ─── Maps ────────────────────────────────────────────────────────────────────
 
 export const MAP_DEFINITIONS: MapDefinition[] = [
-  { id: "forest", name: "Floresta Amaldiçoada", description: "Árvores retorcidas escondem perigos nos cantos escuros.", difficulty: "Iniciante", defenseDebuff: 1.0, manaCostMultiplier: 1.0, monsterLevel: 1, monsters: MONSTER_POOLS.forest, boss: BOSSES.forest, requiredLevel: 1 },
-  { id: "dungeon", name: "Masmorra Esquecida", description: "Corredores úmidos — defesa corrompida pela maldição.", difficulty: "Intermediário", defenseDebuff: 0.8, manaCostMultiplier: 1.0, monsterLevel: 4, monsters: MONSTER_POOLS.dungeon, boss: BOSSES.dungeon, requiredLevel: 2 },
-  { id: "abyss", name: "Abismo Eterno", description: "O fundo do inferno. Mana escoa duas vezes mais rápido.", difficulty: "Avançado", defenseDebuff: 1.0, manaCostMultiplier: 2.0, monsterLevel: 7, monsters: MONSTER_POOLS.abyss, boss: BOSSES.abyss, requiredLevel: 4 },
-  { id: "volcano", name: "Vulcão do Fim", description: "Calor extremo derrete armaduras. Defesa -30%.", difficulty: "Avançado", defenseDebuff: 0.7, manaCostMultiplier: 1.0, monsterLevel: 9, monsters: MONSTER_POOLS.volcano, boss: BOSSES.volcano, requiredLevel: 6 },
-  { id: "cemetery", name: "Cemitério Esquecido", description: "Os mortos nunca dormem. Mana custa 1.5x mais.", difficulty: "Avançado", defenseDebuff: 1.0, manaCostMultiplier: 1.5, monsterLevel: 12, monsters: MONSTER_POOLS.cemetery, boss: BOSSES.cemetery, requiredLevel: 8 },
-  { id: "ice_castle", name: "Castelo de Gelo Eterno", description: "O frio paralisa corpo e alma. Defesa -25% e Mana ×1.5.", difficulty: "Lendário", defenseDebuff: 0.75, manaCostMultiplier: 1.5, monsterLevel: 14, monsters: MONSTER_POOLS.ice_castle, boss: BOSSES.ice_castle, requiredLevel: 11 },
-  { id: "void", name: "O Vazio Absoluto", description: "Além da realidade. Defesa anulada e Mana dobrada.", difficulty: "Lendário", defenseDebuff: 0.5, manaCostMultiplier: 2.0, monsterLevel: 16, monsters: MONSTER_POOLS.void, boss: BOSSES.void, requiredLevel: 14 },
+  { id: "forest",     name: "Floresta Amaldiçoada",  description: "Árvores retorcidas escondem perigos nos cantos escuros.",          difficulty: "Iniciante",    defenseDebuff: 1.0, manaCostMultiplier: 1.0, monsterLevel: 1,  monsters: MONSTER_POOLS.forest,     boss: BOSSES.forest,     requiredLevel: 1  },
+  { id: "dungeon",    name: "Masmorra Esquecida",     description: "Corredores úmidos — defesa corrompida pela maldição.",             difficulty: "Intermediário",defenseDebuff: 0.8, manaCostMultiplier: 1.0, monsterLevel: 4,  monsters: MONSTER_POOLS.dungeon,    boss: BOSSES.dungeon,    requiredLevel: 2  },
+  { id: "abyss",      name: "Abismo Eterno",          description: "O fundo do inferno. Mana escoa duas vezes mais rápido.",           difficulty: "Avançado",     defenseDebuff: 1.0, manaCostMultiplier: 2.0, monsterLevel: 7,  monsters: MONSTER_POOLS.abyss,      boss: BOSSES.abyss,      requiredLevel: 4  },
+  { id: "volcano",    name: "Vulcão do Fim",           description: "Calor extremo derrete armaduras. Defesa -30%.",                    difficulty: "Avançado",     defenseDebuff: 0.7, manaCostMultiplier: 1.0, monsterLevel: 9,  monsters: MONSTER_POOLS.volcano,    boss: BOSSES.volcano,    requiredLevel: 6  },
+  { id: "cemetery",   name: "Cemitério Esquecido",    description: "Os mortos nunca dormem. Mana custa 1.5x mais.",                   difficulty: "Avançado",     defenseDebuff: 1.0, manaCostMultiplier: 1.5, monsterLevel: 12, monsters: MONSTER_POOLS.cemetery,   boss: BOSSES.cemetery,   requiredLevel: 8  },
+  { id: "ice_castle", name: "Castelo de Gelo Eterno", description: "O frio paralisa corpo e alma. Defesa -25% e Mana ×1.5.",           difficulty: "Lendário",     defenseDebuff: 0.75,manaCostMultiplier: 1.5, monsterLevel: 14, monsters: MONSTER_POOLS.ice_castle, boss: BOSSES.ice_castle, requiredLevel: 11 },
+  { id: "void",       name: "O Vazio Absoluto",        description: "Além da realidade. Defesa anulada e Mana dobrada.",               difficulty: "Lendário",     defenseDebuff: 0.5, manaCostMultiplier: 2.0, monsterLevel: 16, monsters: MONSTER_POOLS.void,       boss: BOSSES.void,       requiredLevel: 14 },
 ];
 
-// ─── Shop Items (Ampliado) ────────────────────────────────────────────────────
+// ─── Shop Items ───────────────────────────────────────────────────────────────
 
 export const SHOP_ITEMS: Item[] = [
-  // Armas
-  { id: "iron_sword", name: "⚔️ Espada de Ferro", description: "+3 Ataque", cost: 28, attackBonus: 3, defenseBonus: 0, hpBonus: 0, mpBonus: 0 },
-  { id: "steel_blade", name: "⚔️ Lâmina de Aço", description: "+5 Ataque", cost: 50, attackBonus: 5, defenseBonus: 0, hpBonus: 0, mpBonus: 0 },
-  { id: "mithril_sword", name: "⚔️ Espada de Mithril", description: "+8 Ataque, +2 DEF", cost: 95, attackBonus: 8, defenseBonus: 2, hpBonus: 0, mpBonus: 0 },
-  { id: "void_blade", name: "🌌 Lâmina do Vazio", description: "+12 Ataque", cost: 160, attackBonus: 12, defenseBonus: 0, hpBonus: 0, mpBonus: 0 },
-  // Armaduras
-  { id: "leather_armor", name: "🛡️ Couro Reforçado", description: "+3 Defesa", cost: 28, attackBonus: 0, defenseBonus: 3, hpBonus: 0, mpBonus: 0 },
-  { id: "steel_shield", name: "🛡️ Escudo de Aço", description: "+5 Defesa", cost: 50, attackBonus: 0, defenseBonus: 5, hpBonus: 0, mpBonus: 0 },
-  { id: "dragon_scale", name: "🐉 Escama de Dragão", description: "+7 Defesa, +15 HP", cost: 90, attackBonus: 0, defenseBonus: 7, hpBonus: 15, mpBonus: 0 },
-  { id: "void_armor", name: "🌌 Armadura do Vazio", description: "+10 Defesa, +20 HP", cost: 155, attackBonus: 0, defenseBonus: 10, hpBonus: 20, mpBonus: 0 },
-  // HP
-  { id: "health_potion", name: "❤️ Poção de Vida", description: "+30 HP Máximo", cost: 30, attackBonus: 0, defenseBonus: 0, hpBonus: 30, mpBonus: 0 },
-  { id: "elixir_hp", name: "❤️ Elixir Vital", description: "+55 HP Máximo", cost: 60, attackBonus: 0, defenseBonus: 0, hpBonus: 55, mpBonus: 0 },
-  { id: "life_crystal", name: "💎 Cristal da Vida", description: "+90 HP Máximo, +3 DEF", cost: 120, attackBonus: 0, defenseBonus: 3, hpBonus: 90, mpBonus: 0 },
-  // MP
-  { id: "mana_crystal", name: "💧 Cristal de Mana", description: "+25 Mana Máxima", cost: 28, attackBonus: 0, defenseBonus: 0, hpBonus: 0, mpBonus: 25 },
-  { id: "arcane_tome", name: "📖 Tomo Arcano", description: "+4 ATK, +40 Mana", cost: 75, attackBonus: 4, defenseBonus: 0, hpBonus: 0, mpBonus: 40 },
-  { id: "mana_gem", name: "💎 Gema de Mana", description: "+70 Mana Máxima", cost: 95, attackBonus: 0, defenseBonus: 0, hpBonus: 0, mpBonus: 70 },
-  // Híbridos
-  { id: "enchanted_blade", name: "✨ Lâmina Encantada", description: "+5 ATK, +2 DEF", cost: 65, attackBonus: 5, defenseBonus: 2, hpBonus: 0, mpBonus: 0 },
-  { id: "elixir_power", name: "⚗️ Elixir de Força", description: "+6 ATK, +4 DEF", cost: 100, attackBonus: 6, defenseBonus: 4, hpBonus: 0, mpBonus: 0 },
-  { id: "war_band", name: "💢 Bracelete de Guerra", description: "+4 ATK, +20 HP", cost: 72, attackBonus: 4, defenseBonus: 0, hpBonus: 20, mpBonus: 0 },
-  { id: "sage_ring", name: "💍 Anel do Sábio", description: "+3 ATK, +35 MP", cost: 72, attackBonus: 3, defenseBonus: 0, hpBonus: 0, mpBonus: 35 },
-  { id: "hero_pendant", name: "🏅 Amuleto do Herói", description: "+5 ATK, +5 DEF, +20 HP", cost: 140, attackBonus: 5, defenseBonus: 5, hpBonus: 20, mpBonus: 0 },
-  { id: "arcane_gauntlets", name: "🧤 Manoplas Arcanas", description: "+6 ATK, +30 MP, +10 HP", cost: 145, attackBonus: 6, defenseBonus: 0, hpBonus: 10, mpBonus: 30 },
-  // Lendários
-  { id: "chaos_shard", name: "💥 Fragmento do Caos", description: "+10 ATK, +10 DEF, +30 HP", cost: 220, attackBonus: 10, defenseBonus: 10, hpBonus: 30, mpBonus: 0 },
-  { id: "void_essence", name: "🌌 Essência do Vazio", description: "+8 ATK, +8 DEF, +50 MP", cost: 220, attackBonus: 8, defenseBonus: 8, hpBonus: 0, mpBonus: 50 },
+  // ── Armas ──
+  { id: "iron_sword",     name: "⚔️ Espada de Ferro",    description: "+3 Ataque",                     cost:  28, attackBonus:  3, defenseBonus: 0, hpBonus:  0, mpBonus:  0 },
+  { id: "steel_blade",    name: "⚔️ Lâmina de Aço",      description: "+5 Ataque",                     cost:  50, attackBonus:  5, defenseBonus: 0, hpBonus:  0, mpBonus:  0 },
+  { id: "mithril_sword",  name: "⚔️ Espada de Mithril",  description: "+8 Ataque, +2 DEF",             cost:  95, attackBonus:  8, defenseBonus: 2, hpBonus:  0, mpBonus:  0 },
+  { id: "void_blade",     name: "🌌 Lâmina do Vazio",    description: "+12 Ataque",                    cost: 160, attackBonus: 12, defenseBonus: 0, hpBonus:  0, mpBonus:  0 },
+  // ── Armaduras ──
+  { id: "leather_armor",  name: "🛡️ Couro Reforçado",    description: "+3 Defesa",                     cost:  28, attackBonus: 0, defenseBonus:  3, hpBonus:  0, mpBonus:  0 },
+  { id: "steel_shield",   name: "🛡️ Escudo de Aço",      description: "+5 Defesa",                     cost:  50, attackBonus: 0, defenseBonus:  5, hpBonus:  0, mpBonus:  0 },
+  { id: "dragon_scale",   name: "🐉 Escama de Dragão",   description: "+7 Defesa, +15 HP",             cost:  90, attackBonus: 0, defenseBonus:  7, hpBonus: 15, mpBonus:  0 },
+  { id: "void_armor",     name: "🌌 Armadura do Vazio",  description: "+10 Defesa, +20 HP",            cost: 155, attackBonus: 0, defenseBonus: 10, hpBonus: 20, mpBonus:  0 },
+  // ── HP ──
+  { id: "health_potion",  name: "❤️ Poção de Vida",      description: "+30 HP Máximo",                 cost:  30, attackBonus: 0, defenseBonus: 0, hpBonus: 30, mpBonus:  0 },
+  { id: "elixir_hp",      name: "❤️ Elixir Vital",       description: "+55 HP Máximo",                 cost:  60, attackBonus: 0, defenseBonus: 0, hpBonus: 55, mpBonus:  0 },
+  { id: "life_crystal",   name: "💎 Cristal da Vida",    description: "+90 HP Máximo, +3 DEF",         cost: 120, attackBonus: 0, defenseBonus: 3, hpBonus: 90, mpBonus:  0 },
+  // ── MP ──
+  { id: "mana_crystal",   name: "💧 Cristal de Mana",    description: "+25 Mana Máxima",               cost:  28, attackBonus: 0, defenseBonus: 0, hpBonus:  0, mpBonus: 25 },
+  { id: "arcane_tome",    name: "📖 Tomo Arcano",        description: "+4 ATK, +40 Mana",              cost:  75, attackBonus: 4, defenseBonus: 0, hpBonus:  0, mpBonus: 40 },
+  { id: "mana_gem",       name: "💎 Gema de Mana",       description: "+70 Mana Máxima",               cost:  95, attackBonus: 0, defenseBonus: 0, hpBonus:  0, mpBonus: 70 },
+  // ── Híbridos ──
+  { id: "enchanted_blade",name: "✨ Lâmina Encantada",   description: "+5 ATK, +2 DEF",                cost:  65, attackBonus: 5, defenseBonus: 2, hpBonus:  0, mpBonus:  0 },
+  { id: "elixir_power",   name: "⚗️ Elixir de Força",   description: "+6 ATK, +4 DEF",                cost: 100, attackBonus: 6, defenseBonus: 4, hpBonus:  0, mpBonus:  0 },
+  { id: "war_band",       name: "💢 Bracelete de Guerra",description: "+4 ATK, +20 HP",                cost:  72, attackBonus: 4, defenseBonus: 0, hpBonus: 20, mpBonus:  0 },
+  { id: "sage_ring",      name: "💍 Anel do Sábio",      description: "+3 ATK, +35 MP",                cost:  72, attackBonus: 3, defenseBonus: 0, hpBonus:  0, mpBonus: 35 },
+  { id: "hero_pendant",   name: "🏅 Amuleto do Herói",   description: "+5 ATK, +5 DEF, +20 HP",        cost: 140, attackBonus: 5, defenseBonus: 5, hpBonus: 20, mpBonus:  0 },
+  { id: "arcane_gauntlets",name:"🧤 Manoplas Arcanas",   description: "+6 ATK, +30 MP, +10 HP",        cost: 145, attackBonus: 6, defenseBonus: 0, hpBonus: 10, mpBonus: 30 },
+  // ── Lendários ──
+  { id: "chaos_shard",    name: "💥 Fragmento do Caos",  description: "+10 ATK, +10 DEF, +30 HP",      cost: 220, attackBonus: 10, defenseBonus: 10, hpBonus: 30, mpBonus:  0 },
+  { id: "void_essence",   name: "🌌 Essência do Vazio",  description: "+8 ATK, +8 DEF, +50 MP",        cost: 220, attackBonus:  8, defenseBonus:  8, hpBonus:  0, mpBonus: 50 },
+  // ── Iniciativa ──
+  { id: "swift_boots",    name: "👟 Botas Velozes",      description: "+2 Iniciativa",                  cost:  35, attackBonus: 0, defenseBonus: 0, hpBonus: 0, mpBonus:  0, initiativeBonus: 2 },
+  { id: "hawk_eye",       name: "🦅 Olho de Falcão",     description: "+1 ATK, +3 Iniciativa",          cost:  65, attackBonus: 1, defenseBonus: 0, hpBonus: 0, mpBonus:  0, initiativeBonus: 3 },
+  { id: "shadow_cloak",   name: "🌑 Manto das Sombras",  description: "+2 DEF, +4 Iniciativa",          cost:  90, attackBonus: 0, defenseBonus: 2, hpBonus: 0, mpBonus:  0, initiativeBonus: 4 },
+  { id: "time_crystal",   name: "⌛ Cristal do Tempo",   description: "+3 ATK, +3 DEF, +5 Iniciativa", cost: 175, attackBonus: 3, defenseBonus: 3, hpBonus: 0, mpBonus:  0, initiativeBonus: 5 },
+  { id: "phantom_dagger", name: "🗡️ Adaga Fantasma",     description: "+4 ATK, +6 Iniciativa",          cost: 140, attackBonus: 4, defenseBonus: 0, hpBonus: 0, mpBonus:  0, initiativeBonus: 6 },
 ];
 
 // ─── XP Table ─────────────────────────────────────────────────────────────────

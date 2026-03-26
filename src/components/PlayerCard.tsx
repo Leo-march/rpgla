@@ -37,7 +37,7 @@ export default function PlayerCard({ player, isMe, isCurrentTurn }: PlayerCardPr
             {player.initiativeRoll !== undefined && (
               <span className={`text-xs font-mono ml-auto px-1 rounded flex-shrink-0
                 ${player.initiativeRoll >= 15 ? "text-green-400 bg-green-950/40" :
-                  player.initiativeRoll >= 8 ? "text-yellow-400 bg-yellow-950/40" :
+                  player.initiativeRoll >= 8  ? "text-yellow-400 bg-yellow-950/40" :
                   "text-red-400 bg-red-950/40"}`}>
                 🎲{player.initiativeRoll}
               </span>
@@ -65,22 +65,26 @@ export default function PlayerCard({ player, isMe, isCurrentTurn }: PlayerCardPr
         <StatBar current={player.xp} max={player.xpToNext} color="xp" showText={false} size="sm" />
       </div>
 
-      <div className="flex gap-2 mt-1.5 text-xs text-dungeon-text-dim font-mono">
+      <div className="flex gap-2 mt-1.5 text-xs text-dungeon-text-dim font-mono flex-wrap">
         <span>⚔️{player.attributes.attack}</span>
         <span>🛡️{player.attributes.defense}</span>
+        {(player.attributes.initiativeBonus ?? 0) > 0 && (
+          <span className="text-purple-400">⚡+{player.attributes.initiativeBonus}</span>
+        )}
         <span>💰{player.coins}</span>
-        {player.summonActive && <span className="text-purple-400">💀{player.summonTurnsLeft}t</span>}
+        {player.summonActive && <span className="text-purple-400">💀{player.summonTurnsLeft}r</span>}
       </div>
 
       {player.statusEffects.length > 0 && (
         <div className="flex flex-wrap gap-0.5 mt-1">
           {player.statusEffects.map((se) => (
             <span key={se.id} className={`text-xs px-1 rounded leading-tight
-              ${se.attackBonus ? "bg-red-950/60 text-red-300" :
+              ${se.attackBonus  ? "bg-red-950/60 text-red-300" :
                 se.defenseBonus && se.defenseBonus < 999 ? "bg-yellow-950/60 text-yellow-300" :
                 se.defenseBonus === 999 ? "bg-blue-950/60 text-blue-300" :
+                se.damagePerTurn ? "bg-green-950/60 text-green-300" :
                 "bg-dungeon-border text-dungeon-text-dim"}`}>
-              {se.name.split(" ")[0]} {se.turnsLeft < 999 ? `(${se.turnsLeft}t)` : ""}
+              {se.name.split(" ")[0]} {se.turnsLeft !== -1 ? `(${se.turnsLeft}r)` : ""}
             </span>
           ))}
         </div>
