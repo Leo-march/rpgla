@@ -112,6 +112,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   playerAction: (actionType, opts = {}) => {
     get().socket?.emit("player_action", { actionType, ...opts });
   },
+  // alias usado por ActionPanel
+  performAction: (actionType: ActionType, opts: {
+   skillId?: string; targetId?: string; itemId?: string;
+   comboActionId?: string; partnerId?: string;
+  } = {}) => {
+   get().socket?.emit("player_action", { actionType, ...opts });
+  },
 
   buyItem: (itemId) => {
     get().socket?.emit("buy_item", itemId);
